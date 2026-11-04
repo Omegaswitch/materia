@@ -5,7 +5,7 @@ import s from './Hero.module.css';
 
 export default function Hero() {
   return (
-    <header className={`wrap ${s.hero}`} id="top">
+    <header className={`wrap page ${s.hero}`} id="top">
       <HeroLogo />
       <div className={s.foot}>
         <Grow p={0} vanishBefore="#top h1"><img src={hero.badge.src} alt={hero.badge.alt} width={hero.badge.w} height={hero.badge.h} className={s.badge} /></Grow>

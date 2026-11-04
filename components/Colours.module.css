@@ -1,5 +1,5 @@
 .section { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
-.figure { position: relative; width: min(100%, 1100px); margin: clamp(80px, 12vw, 180px) auto 0; }
+.figure { position: relative; width: min(100%, 1100px); margin: clamp(64px, 10svh, 140px) auto 0; }
 .figure img { width: 100%; }
 .callouts { list-style: none; margin: 0; padding: 0; }
 .label { display: block; font-size: var(--step-body); line-height: 1.15; text-align: center; white-space: nowrap; }
@@ -26,8 +26,8 @@
 
 /* Phone: the board, then the five colours as a list with a swatch each. */
 @media (max-width: 899px) {
-  .figure { margin-top: 40px; }
-  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px 24px; margin-top: 32px; }
+  .figure { margin-top: 28px; }
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 20px; margin-top: 24px; }
   .label { text-align: left; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; align-items: center; }
   .num { grid-column: 2; }
   .label { white-space: normal; }

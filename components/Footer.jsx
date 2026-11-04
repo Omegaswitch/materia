@@ -8,7 +8,7 @@ const HEIGHTS = [100, 72, 88, 64, 94, 70, 82];
 // The name closes the page, each letter cut into its own single piece of wood (public/assets/wood/letters/).
 export default function Footer() {
   return (
-    <footer id="vendors" className={`wrap ${s.footer}`}>
+    <footer id="vendors" className={`wrap page ${s.footer}`}>
       <h2 className={s.mark}>
         {[...site.name].map((ch, i) => (
           <span key={i} aria-hidden="true" className={s.block} style={{ height: `${HEIGHTS[i % HEIGHTS.length]}%`, '--i': i }}>

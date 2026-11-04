@@ -21,7 +21,10 @@
   --font: var(--f-text), Georgia, serif;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+/* Every part of the site is a full page; scrolling always comes to rest on a whole part.
+   A part taller than the screen can still be scrolled through before the next one. */
+.page { min-height: 100svh; scroll-snap-align: start; scroll-snap-stop: always; }
 html, body { overflow-x: clip; }
 body { position: relative; padding-inline: calc(var(--border) + 6px); background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
@@ -42,11 +45,11 @@ body::before { left: 0; }
 body::after { right: 0; transform: scaleX(-1); }
 
 /* Text grows out of the page (components/Grow.jsx). Without JS or with reduced motion it is plain text. */
-.grow-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
-.js .grow:not(.grown) { filter: var(--grow); }
-.js .grow.fade { filter: none; transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
-.js .grow.fade:not(.grown) { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .js .grow:not(.grown) { filter: none; } }
+.seep-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.js .seep:not(.grown) { filter: var(--grow); }
+.js .seep.fade { filter: none; transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.js .seep.fade:not(.grown) { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .js .seep:not(.grown) { filter: none; } }
 .head { font-size: var(--step-head); text-align: center; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
@@ -95,8 +98,8 @@ body::after { right: 0; transform: scaleX(-1); }
 @supports (animation-timeline: view()) {
   .para { animation: para linear both; animation-timeline: view(); animation-range: cover; }
   @keyframes para {
-    from { translate: 0 calc(var(--p, 1) * 7vh); }
-    to { translate: 0 calc(var(--p, 1) * -7vh); }
+    from { translate: 0 calc(var(--p, 1) * 4vh); }
+    to { translate: 0 calc(var(--p, 1) * -4vh); }
   }
 }
 
