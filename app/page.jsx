@@ -5,6 +5,7 @@ import Slides from '../components/Slides';
 import Footer from '../components/Footer';
 import Stack from '../components/Stack';
 import SmoothScroll from '../components/SmoothScroll';
+import WoodScroll from '../components/WoodScroll';
 
 export default function Page() {
   return (
@@ -18,6 +19,7 @@ export default function Page() {
         <Slides />
       </main>
       <Footer />
+      <WoodScroll />
     </SmoothScroll>
   );
 }

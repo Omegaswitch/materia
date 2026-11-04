@@ -35,12 +35,15 @@ function layout(count, seed) {
   });
 }
 
+const MOTIONS = ['pan-x', 'pan-y', 'breathe'];
+
 function Wood({ color, across, gx, gy, className = '' }) {
   return (
     <div
       className={`${styles.wood} ${across ? styles.across : ''} ${className}`}
       style={{
         '--wood': `var(--${color})`, '--gx': `${gx}px`, '--gy': `${gy}px`,
+        '--motion': MOTIONS[(gx + gy) % 3], '--tdur': `${14 + (gx % 12)}s`, '--sdur': `${9 + (gy % 9)}s`, '--tdelay': `-${gy % 13}s`,
         ...(panelTextures.length && { '--tex': `url(${panelTextures[(gx + gy) % panelTextures.length]})` }),
       }}
     />
@@ -50,11 +53,12 @@ function Wood({ color, across, gx, gy, className = '' }) {
 /**
  * Field of drifting wood panels and tiles. Absolutely fills its positioned parent.
  * open: blocks part (staggered, alternating up/down; squares tilt away) to reveal what is behind.
+ * scrub: driven by the CSS var --amt (0 closed → 1 open) set by a parent, e.g. from scroll. Overrides open.
  */
-export default function Panels({ open = false, columns = 5, seed = 1 }) {
+export default function Panels({ open = false, scrub = false, columns = 5, seed = 1 }) {
   return (
     <div
-      className={`${styles.panels}${open ? ` ${styles.open}` : ''}`}
+      className={`${styles.panels}${scrub ? ` ${styles.scrub}` : open ? ` ${styles.open}` : ''}`}
       style={{ '--tex-o': panelTextureOpacity, '--block-o': panelBlockOpacity }}
       aria-hidden="true"
     >
@@ -72,6 +76,7 @@ export default function Panels({ open = false, columns = 5, seed = 1 }) {
                   '--dir': dir,
                   '--nudge': `${b.nudge}px`,
                   '--stag': `${(i * 70 + j * 110 + (b.square ? 160 : 0))}ms`,
+                  '--s': ((i * 0.37 + j * 0.23 + (b.square ? 0.3 : 0)) % 1).toFixed(2),
                 }}
               >
                 <div

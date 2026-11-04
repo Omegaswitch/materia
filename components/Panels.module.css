@@ -46,9 +46,26 @@
   mix-blend-mode: multiply;
   opacity: var(--tex-o);
 }
-.across::after { transform: rotate(90deg) scale(2); }
+.wood::after { inset: -20%; animation: var(--motion) var(--tdur) ease-in-out var(--tdelay) infinite alternate; }
+.across::after { rotate: 90deg; scale: 1.6; }
+/* Soft light passing over the grain, each block on its own clock. */
+.wood::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 236 210 / 0.10) 50%, transparent 65%);
+  background-size: 300% 100%;
+  animation: sheen var(--sdur) linear var(--tdelay) infinite;
+}
+/* Three texture motions, picked per block. */
+@keyframes pan-x { from { transform: translate3d(-6%, 0, 0); } to { transform: translate3d(6%, 0, 0); } }
+@keyframes pan-y { from { transform: translate3d(0, -6%, 0); } to { transform: translate3d(0, 6%, 0); } }
+@keyframes breathe { from { transform: scale(1) translate3d(-2%, 1%, 0); } to { transform: scale(1.12) translate3d(2%, -1%, 0); } }
+@keyframes sheen { from { background-position: 100% 0; } to { background-position: -200% 0; } }
 .half + .half { border-left: 1px solid rgb(0 0 0 / 0.28); }
 
 /* Reveal: planks slide out vertically alternating; squares tilt and drop the other way. */
 .open .slot { transform: translateY(calc(var(--dir) * 135cqh)); }
 .open .square { transform: translateY(calc(var(--dir) * -135cqh)) rotate(calc(var(--dir) * 9deg)); }
+
+/* Scroll-driven mode (amount prop): each block leaves at its own point of the 0→1 range. */
+.scrub .slot { transition: none; transform: translateY(calc(var(--dir) * 135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }
+.scrub .square { transform: translateY(calc(var(--dir) * -135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))) rotate(calc(var(--dir) * 9deg * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }

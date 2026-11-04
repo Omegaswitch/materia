@@ -37,6 +37,7 @@ export default function HorizontalScroll({ slides, label }: { slides: Slide[]; l
     <section
       ref={sectionRef}
       aria-label={label}
+      data-slides={reduced ? undefined : slides.length}
       className="relative"
       style={reduced ? undefined : { height: `${slides.length * 100}vh` }}
     >
