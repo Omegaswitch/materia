@@ -5,8 +5,9 @@ import { useReducedMotion } from '@/components/hooks';
 
 // Fixed wood layer over the whole site. Near every page boundary the blocks close in and part again,
 // so each page change happens through the wood. Off with reduced motion.
-// BAND: how far (in viewport heights) from a boundary the wood starts closing.
-const BAND = 0.45;
+// BAND: how far (in viewport heights) from a boundary the wood starts closing. Pages and slides are ~1 viewport apart,
+// so the wood covers the screen for about 2 × BAND of every page/slide change.
+const BAND = 0.16;
 
 export default function WoodScroll() {
   const ref = useRef<HTMLDivElement>(null);
