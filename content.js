@@ -12,6 +12,8 @@ export const hero = {
   sentence: 'GMK CYL Materia, a keycap set made together by Bowlkeyboards and Aiglatson Studio.',
   action: { label: 'Find a vendor', href: '#vendors' },
   badge: { src: '/assets/badge.webp', alt: 'Bowlkeyboards and Aiglatson Studio', w: 80, h: 145 },
+  // The deck's lockup. Shown dithered in brown; the pointer reveals it in full colour.
+  logo: { src: '/assets/logo.webp', alt: 'GMK CYL Materia', w: 1360, h: 492 },
 };
 
 export const story = {

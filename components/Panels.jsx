@@ -12,7 +12,6 @@ function rng(seed) {
 export const woodStyle = (id, n, hex) => ({
   '--c': hex ?? byId[id].hex,
   '--tex': `url(${panelTextures[n % panelTextures.length]})`,
-  '--gx': `${(n * 137) % 400}px`, '--gy': `${(n * 89) % 300}px`,
 });
 
 // A full-width band of planks. Columns drift at their own rate as the band scrolls past (CSS scroll timeline).
@@ -20,7 +19,7 @@ export default function Planks({ columns = 7, seed = 5 }) {
   const rnd = rng(seed);
   let n = 0;
   return (
-    <div className={s.band} aria-hidden="true">
+    <div className={`para ${s.band}`} style={{ '--p': -0.8 }} aria-hidden="true">
       {Array.from({ length: columns }, (_, i) => (
         <div key={i} className={s.col} style={{ '--k': (rnd() * 2 - 1).toFixed(2), flexGrow: (0.6 + rnd()).toFixed(2) }}>
           {Array.from({ length: 2 + Math.floor(rnd() * 3) }, (_, j) => (

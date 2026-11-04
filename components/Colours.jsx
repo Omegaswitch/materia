@@ -6,8 +6,8 @@ export default function Colours() {
   const r = colours.render;
   return (
     <section id="colours" className={`wrap ${s.section}`} aria-labelledby="colours-title">
-      <h2 id="colours-title" className="head">{colours.heading}</h2>
-      <figure className={s.figure} data-reveal>
+      <h2 id="colours-title" className="head para" style={{ '--p': 1.4 }}>{colours.heading}</h2>
+      <figure className={`para ${s.figure}`} style={{ '--p': 0.4 }} data-reveal>
         <img src={r.src} srcSet={`${r.small} 900w, ${r.src} 1520w`} sizes="(max-width: 899px) 100vw, 70vw" width={r.w} height={r.h} alt={r.alt} loading="lazy" decoding="async" />
         <ul className={s.callouts} role="list">
           {colours.items.map((c) => {

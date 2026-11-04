@@ -20,6 +20,7 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "next": "^15.5.29",
+    "ogl": "^1.0.11",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwind-merge": "^3.7.0"
