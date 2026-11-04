@@ -1,0 +1,34 @@
+.section { margin-top: var(--gap); }
+.figure { position: relative; width: min(100%, 1100px); margin: clamp(80px, 12vw, 180px) auto 0; }
+.figure img { width: 100%; }
+.callouts { list-style: none; margin: 0; padding: 0; }
+.label { display: block; font-size: var(--step-body); line-height: 1.15; text-align: center; white-space: nowrap; }
+.num { display: block; }
+.swatch { display: none; }
+
+/* Desktop: labels around the board, each tied to its key by a line, as in the deck. */
+@media (min-width: 900px) {
+  .callouts { position: absolute; inset: 0; }
+  .callout { position: absolute; inset: 0; pointer-events: none; }
+  .line { position: absolute; background: var(--ink); transform-origin: var(--from); transition: transform 1s var(--ease) 0.4s; }
+  .label { position: absolute; }
+  .left .line { top: var(--y); left: calc(-1 * var(--ext)); width: calc(var(--x) + var(--ext)); height: 1px; --from: 100% 50%; }
+  .left .label { top: var(--y); right: calc(100% + var(--ext) + 16px); translate: 0 -50%; }
+  .right .line { top: var(--y); left: var(--x); right: calc(-1 * var(--ext)); height: 1px; --from: 0 50%; }
+  .right .label { top: var(--y); left: calc(100% + var(--ext) + 16px); translate: 0 -50%; }
+  .top .line { left: var(--x); top: calc(-1 * var(--ext)); height: calc(var(--y) + var(--ext)); width: 1px; --from: 50% 100%; }
+  .top .label { left: var(--x); bottom: calc(100% + var(--ext) + 12px); translate: -50% 0; }
+  .bottom .line { left: var(--x); top: var(--y); bottom: calc(-1 * var(--ext)); width: 1px; --from: 50% 0; }
+  .bottom .label { left: var(--x); top: calc(100% + var(--ext) + 12px); translate: -50% 0; }
+  :global(.js) .figure:not(:global(.in)) .line { transform: scale(0); }
+  .figure { --ext: clamp(28px, 3vw, 48px); margin-bottom: clamp(80px, 9vw, 140px); width: min(100% - 2 * clamp(150px, 15vw, 230px), 1100px); }
+}
+
+/* Phone: the board, then the five colours as a list with a swatch each. */
+@media (max-width: 899px) {
+  .figure { margin-top: 40px; }
+  .callouts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 32px; }
+  .label { text-align: left; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; align-items: center; }
+  .num { grid-column: 2; }
+  .swatch { display: block; grid-row: span 2; width: 28px; height: 28px; border-radius: 4px; background: var(--c); border-bottom: 4px solid color-mix(in oklab, var(--c) 60%, #000); }
+}

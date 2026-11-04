@@ -1,98 +1,75 @@
-// All editable site content, colours and asset paths live here.
-// Asset `src: null` renders a labeled placeholder. Set a path (e.g. '/assets/logo.svg') to use a real file.
+// All editable site content lives here. Page colours are CSS tokens in app/globals.css.
+// Facts come from the GMK CYL MATERIA WIP deck. PLACEHOLDER = still to be supplied.
 
-export const palette = {
-  bark: '#5b3a31',   // darkest panel brown
-  rust: '#974f42',
-  clay: '#99644e',   // muted terracotta
-  paper: '#ece3cf',
-  paperDeep: '#e2d6bc',
-  ink: '#2b1b15',
-  inkSoft: '#7a3f30', // rust-ink used for story body text
+export const site = {
+  name: 'MATERIA',
+  title: 'GMK CYL Materia',
+  makers: 'Bowlkeyboards and Aiglatson Studio',
+  description: 'GMK CYL Materia, a keycap set made together by Bowlkeyboards and Aiglatson Studio, in five Pantone browns.',
 };
 
-// Panel colours used by every moving block field, in palette keys.
-export const panelColors = ['bark', 'rust', 'clay'];
-
-// Wood photo textures for the blocks: put files in public/assets/wood/ and list them here.
-// Each block picks one (by seed) and layers it semi-transparently over its palette colour.
-export const panelTextures = [
-  '/assets/wood/w01.webp',
-  '/assets/wood/w02.webp',
-  '/assets/wood/w03.webp',
-  '/assets/wood/w04.webp',
-  '/assets/wood/w05.webp',
-  '/assets/wood/w06.webp',
-  '/assets/wood/w07.webp',
-  '/assets/wood/w08.webp',
-  '/assets/wood/w09.webp',
-  '/assets/wood/w10.webp',
-];
-// How strongly the texture shows (0–1), and how see-through the blocks are where they overlap (0–1).
-export const panelTextureOpacity = 0.55;
-export const panelBlockOpacity = 0.94;
-
-export const logo = {
-  src: null,
-  alt: 'MATERIA logo',
-  label: 'Logo goes here — MATERIA wordmark (SVG preferred)',
+export const hero = {
+  sentence: 'GMK CYL Materia, a keycap set made together by Bowlkeyboards and Aiglatson Studio.',
+  action: { label: 'Find a vendor', href: '#vendors' },
+  badge: { src: '/assets/badge.webp', alt: 'Bowlkeyboards and Aiglatson Studio', w: 80, h: 145 },
 };
 
 export const story = {
   word: 'MATERIA.',
-  pronunciation: '[PLACEHOLDER: pronunciation]',
-  // Placeholder: replace with the final story copy. No etymology claims until supplied.
-  paragraphs: [
-    'PLACEHOLDER — What the name MATERIA means to this set. Replace with final copy.',
-    'PLACEHOLDER — The idea behind the colours and materials. Replace with final copy.',
-  ],
+  pronunciation: '[má-te-ri-a]',
+  language: 'Latin',
+  definition: '(n.) Traced to mater (“mother”), the Romans saw timber not just as raw material, but as the foundational source, the true mother, of everything built.',
 };
 
-export const keyboard = {
+// The five colours. hex is sampled from the render; replace with the official Pantone values if they differ.
+// x / y: where the callout points on the render (% of its width / height). side: where the label sits on desktop.
+export const colours = {
   heading: 'The colours',
-  image: {
-    src: null,
-    alt: 'PLACEHOLDER alt: MATERIA keycap set on a keyboard, blank keycaps',
-    label: 'Keyboard render goes here — blank keycaps, front-on, ~2.6:1',
-    ratio: '2.6 / 1',
-  },
-  // x / y: callout target as % of the keyboard image. side: where the label sits on desktop.
-  colors: [
-    { id: 'c1', name: 'PLACEHOLDER Colour 1', description: 'PLACEHOLDER — one line about this colour.', swatch: '#5b3a31', x: 22, y: 30, side: 'top' },
-    { id: 'c2', name: 'PLACEHOLDER Colour 2', description: 'PLACEHOLDER — one line about this colour.', swatch: '#974f42', x: 48, y: 52, side: 'top' },
-    { id: 'c3', name: 'PLACEHOLDER Colour 3', description: 'PLACEHOLDER — one line about this colour.', swatch: '#99644e', x: 78, y: 28, side: 'top' },
-    { id: 'c4', name: 'PLACEHOLDER Colour 4', description: 'PLACEHOLDER — one line about this colour.', swatch: '#b07a5c', x: 12, y: 74, side: 'bottom' },
-    { id: 'c5', name: 'PLACEHOLDER Colour 5', description: 'PLACEHOLDER — one line about this colour.', swatch: '#6e4637', x: 62, y: 82, side: 'bottom' },
+  render: { src: '/assets/render-1520.webp', small: '/assets/render-900.webp', w: 1520, h: 610, alt: 'GMK CYL Materia on a 60% keyboard: every key one of five Pantone browns, mixed across the board' },
+  items: [
+    { id: 'p7591', name: 'PANTONE 7591 C', hex: '#95604c', x: 77.9, y: 67, side: 'bottom' },
+    { id: 'p7592', name: 'PANTONE 7592 C', hex: '#8b453a', x: 19.5, y: 68, side: 'left' },
+    { id: 'p7593', name: 'PANTONE 7593 C', hex: '#673933', x: 4.5, y: 21, side: 'left' },
+    { id: 'p7594', name: 'PANTONE 7594 C', hex: '#4f3028', x: 85.5, y: 36, side: 'right' },
+    { id: 'p7595', name: 'PANTONE 7595 C', hex: '#47322b', x: 69.7, y: 21, side: 'top' },
   ],
 };
 
-// span: grid columns out of 6 on desktop. ratio: CSS aspect-ratio. Add, remove or reorder freely.
-export const kitting = {
-  heading: 'Kitting',
-  items: [
-    { src: null, alt: 'PLACEHOLDER alt: base kit', label: 'Kitting image — Base kit', span: 4, ratio: '4 / 3' },
-    { src: null, alt: 'PLACEHOLDER alt: alphas kit', label: 'Kitting image — Alphas', span: 2, ratio: '3 / 4' },
-    { src: null, alt: 'PLACEHOLDER alt: modifiers kit', label: 'Kitting image — Modifiers', span: 3, ratio: '3 / 2' },
-    { src: null, alt: 'PLACEHOLDER alt: novelties kit', label: 'Kitting image — Novelties', span: 3, ratio: '3 / 2' },
+// Board rows: keys separated by spaces, `Name:2.25` sets a width in units, `_` is a spacebar.
+// Kits are drawn from these rows, each cap in one of the five colours, until kitting renders arrive:
+// set src to a kitting image to show it instead.
+export const kits = {
+  heading: 'Kits',
+  items: [ // PLACEHOLDER kit names and contents
+    { id: 'base', name: 'Base kit', src: null, alt: 'Base kit', rows: [
+      'Esc 1 2 3 4 5 6 7 8 9 0 - = ←:2',
+      'Tab:1.5 Q W E R T Y U I O P [ ] \\:1.5',
+      "⇩:1.75 A S D F G H J K L ; ' Enter:2.25",
+      '⇧:2.25 Z X C V B N M , . / ⇧:1.75 Fn',
+      'Control:1.5 Code Alt:1.5 _:7 Alt:1.5 Code Control:1.5',
+    ] },
+    { id: 'alphas', name: 'Alphas', src: null, alt: 'Alphas kit', rows: ['Q W E R T Y U I O P', 'A S D F G H J K L', 'Z X C V B N M'] },
+    { id: 'mods', name: 'Modifiers', src: null, alt: 'Modifiers kit', rows: ['Control:1.25 Alt:1.25 Code:1.25 Fn:1.25 Menu:1.25', 'Tab:1.5 ⇩:1.75 ⇧:2.25 ⇧:2.75', '_:6.25 _:7'] },
+    { id: 'novelties', name: 'Novelties', src: null, alt: 'Novelties kit', rows: ['M A T E R I A'] },
   ],
 };
 
-export const renders = {
-  heading: 'Renders',
-  items: [
-    { src: null, alt: 'PLACEHOLDER alt: render 1', label: 'Render 1 — full board', span: 6, ratio: '21 / 9' },
-    { src: null, alt: 'PLACEHOLDER alt: render 2', label: 'Render 2 — detail', span: 2, ratio: '1 / 1' },
-    { src: null, alt: 'PLACEHOLDER alt: render 3', label: 'Render 3 — detail', span: 2, ratio: '1 / 1' },
-    { src: null, alt: 'PLACEHOLDER alt: render 4', label: 'Render 4 — detail', span: 2, ratio: '1 / 1' },
-  ],
-};
+// Renders shown in a simple gallery. Leave empty to hide the section.
+export const renders = [
+  // { src: '/assets/render-desk.webp', alt: '…', w: 1600, h: 1000 },
+];
 
 export const footer = {
   vendors: [
-    { name: 'Vendor 1 (placeholder)', href: '#', logo: null },
-    { name: 'Vendor 2 (placeholder)', href: '#', logo: null },
-    { name: 'Vendor 3 (placeholder)', href: '#', logo: null },
+    { name: 'Vendor 1', href: '#' }, // PLACEHOLDER vendors
+    { name: 'Vendor 2', href: '#' },
+    { name: 'Vendor 3', href: '#' },
   ],
   privacy: { label: 'Privacy policy', href: '#' },
-  info: ['PLACEHOLDER — contact address', 'PLACEHOLDER — other site information'],
+  info: ['PLACEHOLDER: contact address', 'PLACEHOLDER: other site information'],
 };
+
+// Wood photo textures for the plank band and the footer blocks (public/assets/wood/).
+export const panelTextures = Array.from({ length: 10 }, (_, i) => `/assets/wood/w${i + 1 < 10 ? '0' : ''}${i + 1}.webp`);
+// Plank colours, by colour id above.
+export const panelColors = ['p7591', 'p7592', 'p7593', 'p7594'];

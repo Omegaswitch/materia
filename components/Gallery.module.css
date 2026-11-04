@@ -1,0 +1,2 @@
+.section { margin-top: var(--gap); display: grid; gap: clamp(24px, 4vw, 56px); }
+.img { width: min(100%, 1200px); margin-inline: auto; }

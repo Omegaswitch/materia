@@ -1,78 +1,88 @@
 @import "tailwindcss";
 
-/* Colour tokens mirror content.js `palette` — change both together. */
 :root {
-  --bark: #5b3a31;
-  --rust: #974f42;
-  --clay: #99644e;
-  --paper: #ece3cf;
-  --paper-deep: #e2d6bc;
+  --paper: #ece4ce;          /* the paper of the deck */
+  --paper-deep: #e3d8bd;
   --ink: #2b1b15;
-  --ink-soft: #7a3f30;
+  --rust-ink: #7a3f30;       /* the definition colour in the deck, 7:1 on paper */
+  --clay: #a0624c;           /* GM / K in the lockup */
   --gutter: clamp(16px, 4vw, 56px);
-  --ease: cubic-bezier(0.7, 0, 0.2, 1);
-  /* Fonts: set in app/layout.jsx */
-  --font-display: var(--f-display), Georgia, serif;
-  --font-text: var(--f-text), Georgia, serif;
+  --gap: clamp(112px, 13vw, 200px);
+  --radius: 6px;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+
+  --step-small: 0.9375rem;
+  --step-body: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --step-lead: clamp(1.375rem, 1.1rem + 0.9vw, 2rem);
+  --step-head: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+  --step-display: clamp(3.5rem, 1rem + 8vw, 9rem);
+
+  --font: var(--f-text), Georgia, serif;
 }
 
-* { box-sizing: border-box; margin: 0; }
 html { scroll-behavior: smooth; }
 html, body { overflow-x: clip; }
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-text);
-  font-size: clamp(17px, 1.1vw + 12px, 21px);
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-}
-img { display: block; max-width: 100%; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+body { background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--rust-ink); outline-offset: 3px; }
+::selection { background: var(--ink); color: var(--paper); }
+img { display: block; max-width: 100%; height: auto; }
 
-/* Aged paper: flat beige + grain + faint mottling, generated (no image asset). */
-.paper {
-  background-color: var(--paper);
-  background-image:
-    radial-gradient(ellipse at 20% 30%, rgb(160 120 70 / 0.08), transparent 60%),
-    radial-gradient(ellipse at 80% 70%, rgb(140 100 60 / 0.07), transparent 55%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.wrap { padding-inline: var(--gutter); }
+.head { font-size: var(--step-head); text-align: center; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* A button is a small keycap: a flat top over a darker lip. */
+.btn {
+  --c: var(--ink);
+  display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px 3px;
+  background: var(--c); color: var(--paper); text-decoration: none; font-size: var(--step-body);
+  border-radius: var(--radius); border-bottom: 5px solid color-mix(in oklab, var(--c) 60%, #000);
+  transition: transform 0.15s var(--ease), background-color 0.2s;
+}
+.btn:hover { background: color-mix(in oklab, var(--c) 85%, var(--paper)); }
+.btn:active { transform: translateY(2px); }
+
+/* ---------- Drawn keycaps (kits). Legends are white sans, as on the GMK caps. ---------- */
+.board { container-type: inline-size; display: grid; gap: calc(100cqi / var(--n) * 0.06); }
+.board-row { display: flex; gap: calc(100cqi / var(--n) * 0.06); }
+.cap {
+  --u: calc(100cqi / var(--n, 15));
+  position: relative; display: block; flex: none;
+  width: calc(var(--w, 1) * var(--u) - var(--u) * 0.06); height: calc(var(--u) * 0.94);
+  border-radius: calc(var(--u) * 0.1);
+  background: color-mix(in oklab, var(--c) 70%, #120806);
+}
+.cap-top {
+  position: absolute; inset: calc(var(--u) * 0.05) calc(var(--u) * 0.1) calc(var(--u) * 0.16);
+  border-radius: calc(var(--u) * 0.07); background: var(--c); color: #f3ebdd;
+  font-size: calc(var(--u) * 0.24); padding: calc(var(--u) * 0.09) calc(var(--u) * 0.1);
+}
+.legend { display: block; width: 1em; height: 1em; overflow: visible; fill: currentColor; font-family: var(--font); }
+.board .legend { font-family: Arial, Helvetica, sans-serif; font-weight: 700; }
+
+/* ---------- Wood: a palette colour with one photo texture multiplied in, painted once ---------- */
+.wood {
+  background-color: var(--c); background-image: var(--tex);
+  background-size: 640px auto; /* textures are 640px wide */ background-position: var(--gx, 0) var(--gy, 0);
+  background-blend-mode: multiply;
 }
 
-.section-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(36px, 5vw, 72px);
-  line-height: 1;
+/* ---------- Entrances: parts of a section rise in turn, once. Only when JS runs (html.js). ---------- */
+.js [data-reveal] > * { opacity: 0; transform: translateY(20px); }
+.js [data-reveal].in > * {
+  opacity: 1; transform: none;
+  transition: opacity 0.8s var(--ease), transform 1s var(--ease);
+  transition-delay: calc(var(--i, 0) * 90ms);
 }
-
-/* ---------- Assets ---------- */
-.asset { position: relative; overflow: hidden; background: var(--paper-deep); width: 100%; }
-.asset img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s; }
-.asset--loading img { opacity: 0; }
-.asset--loading::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
-  animation: shimmer 1.4s infinite;
-}
-@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
-.asset--placeholder {
-  display: grid; place-items: center; padding: 16px; text-align: center;
-  border: 1.5px dashed rgb(91 58 49 / 0.45);
-  color: var(--bark); font-size: 0.8em; letter-spacing: 0.02em;
-  min-height: 120px;
-}
+[data-reveal] > :nth-child(2) { --i: 1; }
+[data-reveal] > :nth-child(3) { --i: 2; }
+[data-reveal] > :nth-child(4) { --i: 3; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  .js [data-reveal] > * { opacity: 1; transform: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-
-/* ---------- Stacked pages (components/Stack.tsx) ---------- */
-.stack > * {
-  position: sticky; top: 0; min-height: 100svh;
-  background-color: var(--paper);
-  box-shadow: 0 -18px 40px -24px rgb(43 27 21 / 0.45);
-}
-@media (prefers-reduced-motion: reduce) { .stack > * { position: relative; top: auto !important; } }

@@ -1,25 +1,25 @@
-import Landing from '../components/Landing';
+import Hero from '../components/Hero';
 import Story from '../components/Story';
-import Keyboard from '../components/Keyboard';
-import Slides from '../components/Slides';
+import Colours from '../components/Colours';
+import Planks from '../components/Panels';
+import Kits from '../components/Kits';
+import Gallery from '../components/Gallery';
 import Footer from '../components/Footer';
-import Stack from '../components/Stack';
-import SmoothScroll from '../components/SmoothScroll';
-import WoodScroll from '../components/WoodScroll';
+import Reveal from '../components/Reveal';
 
 export default function Page() {
   return (
-    <SmoothScroll>
+    <>
       <main>
-        <Stack>
-          <Landing />
-          <Story />
-          <Keyboard />
-        </Stack>
-        <Slides />
+        <Hero />
+        <Story />
+        <Colours />
+        <Planks />
+        <Kits />
+        <Gallery />
       </main>
       <Footer />
-      <WoodScroll />
-    </SmoothScroll>
+      <Reveal />
+    </>
   );
 }
