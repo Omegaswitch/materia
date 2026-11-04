@@ -1,3 +1,4 @@
+import Grow from './Grow';
 import { story } from '../content';
 import s from './Story.module.css';
 
@@ -5,10 +6,10 @@ import s from './Story.module.css';
 export default function Story() {
   return (
     <section id="story" className={`wrap ${s.story}`} aria-labelledby="story-title">
-      <div className={`para ${s.entry}`} style={{ '--p': 1 }} data-reveal>
-        <h2 id="story-title" className={s.word}>{story.word}</h2>
-        <p className={s.pron}>{story.pronunciation} <span>{story.language}</span></p>
-        <p className={s.def}>{story.definition}</p>
+      <div className={`para ${s.entry}`} style={{ '--p': 1 }}>
+        <Grow as="h2" id="story-title" className={s.word} duration={3200}>{story.word}</Grow>
+        <Grow as="p" className={s.pron} delay={500}>{story.pronunciation} <span>{story.language}</span></Grow>
+        <Grow as="p" className={s.def} delay={900} duration={3000}>{story.definition}</Grow>
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import Grow from './Grow';
 import { Legend } from './keys';
 import { footer, site, hero } from '../content';
 import s from './Footer.module.css';
@@ -20,19 +21,19 @@ export default function Footer() {
       <div className={s.info}>
         <div className={s.makers}>
           <img src={hero.badge.src} alt="" width={hero.badge.w} height={hero.badge.h} />
-          <p>{site.title}, by {site.makers}.</p>
+          <Grow as="p">{site.title}, by {site.makers}.</Grow>
         </div>
-        <div>
+        <Grow delay={200}>
           <h3 className={s.h}>Vendors</h3>
           <ul role="list">{footer.vendors.map((v) => <li key={v.name}><a href={v.href}>{v.name}</a>{v.region && `, ${v.region}`}</li>)}</ul>
-        </div>
-        <div>
+        </Grow>
+        <Grow delay={400}>
           <h3 className={s.h}>Information</h3>
           {footer.info.map((line) => <p key={line}>{line}</p>)}
           <p><a href={footer.privacy.href}>{footer.privacy.label}</a></p>
-        </div>
+        </Grow>
       </div>
-      <p className={s.last}>© {new Date().getFullYear()} {site.makers} · <a href="#top">Back to top</a></p>
+      <Grow as="p" className={s.last} delay={500}>© {new Date().getFullYear()} {site.makers} · <a href="#top">Back to top</a></Grow>
     </footer>
   );
 }
