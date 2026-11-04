@@ -10,7 +10,7 @@
 @media (min-width: 900px) {
   .callouts { position: absolute; inset: 0; }
   .callout { position: absolute; inset: 0; pointer-events: none; }
-  .line { position: absolute; background: var(--ink); transform-origin: var(--from); transition: transform 1s var(--ease) 0.4s; }
+  .line { position: absolute; background: var(--ink); transform-origin: var(--from); transition: transform 1.4s var(--ease) 1.2s; }
   .label { position: absolute; }
   .left .line { top: var(--y); left: calc(-1 * var(--ext)); width: calc(var(--x) + var(--ext)); height: 1px; --from: 100% 50%; }
   .left .label { top: var(--y); right: calc(100% + var(--ext) + 16px); translate: 0 -50%; }

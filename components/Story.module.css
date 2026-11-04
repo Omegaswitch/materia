@@ -1,6 +1,7 @@
 .story { min-height: 100svh; display: grid; place-items: center; }
-.entry { min-width: 0; overflow-wrap: anywhere; max-width: 38ch; font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem); }
-.word { font-size: clamp(2.75rem, 1rem + 6vw, 7rem); line-height: 0.9; letter-spacing: 0; margin-left: -0.04em; }
+.entry { min-width: 0; width: fit-content; max-width: 100%; font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem); }
+.word { white-space: nowrap; font-size: clamp(2.5rem, 0.6rem + 9vw, 7rem); line-height: 0.9; letter-spacing: 0; margin-left: -0.04em; }
+.pron, .def { max-width: 38ch; }
 .pron { margin: 0.9em 0 0.2em; line-height: 1.3; }
 .pron span { margin-left: 0.5em; }
-.def { color: var(--rust-ink); line-height: 1.35; }
+.def { overflow-wrap: break-word; color: var(--rust-ink); line-height: 1.35; }

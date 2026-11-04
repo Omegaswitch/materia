@@ -8,7 +8,8 @@ import { useEffect, useId, useRef } from 'react';
 // so nothing on the page moves in lockstep.
 const SHARP = 7; // how crisp the growing edge is
 
-export default function Grow({ as: Tag = 'div', children, className = '', style, duration = 2400, delay = 0, p, ...rest }) {
+// vanishBefore: a selector; as this block scrolls up toward that element it dissolves back into the page, gone before it touches.
+export default function Grow({ as: Tag = 'div', children, className = '', style, duration = 2400, delay = 0, p, vanishBefore, ...rest }) {
   const ref = useRef(null);
   const matrix = useRef(null);
   const warp = useRef(null);
@@ -49,8 +50,27 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
       else raf = requestAnimationFrame(tick);
     });
     io.observe(el);
-    return () => { io.disconnect(); cancelAnimationFrame(raf); };
-  }, [delay, time]);
+
+    // Dissolve as it nears vanishBefore: by the gap left, as a share of the gap at rest (layout positions, no transforms)
+    const target = vanishBefore && document.querySelector(vanishBefore);
+    let frame = 0;
+    const top = (n) => { let y = 0; for (; n; n = n.offsetParent) y += n.offsetTop; return y; };
+    const check = () => {
+      frame = 0;
+      if (!target || !el.classList.contains('grown') && !el.dataset.vanishing) return;
+      const rest = Math.max(40, (top(el) - top(target) - target.offsetHeight) * 0.9);
+      const gap = el.getBoundingClientRect().top - target.getBoundingClientRect().bottom;
+      const q = Math.min(1, Math.max(0, gap / rest));
+      if (q >= 1) { delete el.dataset.vanishing; el.classList.add('grown'); el.style.opacity = ''; return; }
+      el.dataset.vanishing = '1';
+      if (fade) { el.style.opacity = String(q); return; }
+      el.classList.remove('grown');
+      set(q);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check); };
+    if (target) addEventListener('scroll', onScroll, { passive: true });
+    return () => { io.disconnect(); cancelAnimationFrame(raf); cancelAnimationFrame(frame); removeEventListener('scroll', onScroll); };
+  }, [delay, time, vanishBefore]);
 
   return (
     <Tag ref={ref} className={`grow${drift ? ' para' : ''} ${className}`} style={{ ...style, '--grow': `url(#${id})`, ...(drift ? { '--p': drift } : null) }} {...rest}>

@@ -12,8 +12,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={text.variable}>
       <head>
-        {/* Entrance states only apply while JS runs. If the app has not started within 4 s (blocked or failed chunks), they are dropped so nothing stays hidden. */}
-        <script dangerouslySetInnerHTML={{ __html: "var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!window.__live)d.classList.remove('js')},4000)" }} />
+        {/* A refresh always lands at the top of the page (no restored scroll, no #anchor jump); a shared #link still works on first visit.
+            Entrance states only apply while JS runs. If the app has not started within 4 s (blocked or failed chunks), they are dropped so nothing stays hidden. */}
+        <script dangerouslySetInnerHTML={{ __html: "var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!window.__live)d.classList.remove('js')},4000);"
+          + "history.scrollRestoration='manual';var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];"
+          + "if(n&&n.type==='reload'){if(location.hash)history.replaceState(null,'',location.pathname+location.search);scrollTo(0,0)}" }} />
       </head>
       <body>{children}</body>
     </html>
