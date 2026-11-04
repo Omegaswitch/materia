@@ -1,0 +1,10 @@
+.section { padding: clamp(64px, 10vw, 140px) var(--gutter); }
+.grid {
+  margin-top: clamp(28px, 4vw, 56px);
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: clamp(8px, 1.2vw, 16px);
+  align-items: start;
+}
+.cell { grid-column: span var(--span); }
+@media (max-width: 899px) { .cell { grid-column: span 3; } }
+@media (max-width: 599px) { .cell { grid-column: 1 / -1; } }

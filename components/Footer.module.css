@@ -1,0 +1,6 @@
+.footer { position: relative; overflow: hidden; min-height: 70svh; display: flex; align-items: center; }
+.inner { width: 100%; padding: clamp(56px, 8vw, 120px) var(--gutter); display: grid; gap: 40px; }
+.vendors { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+.vendors a { display: block; text-decoration: none; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 32px; font-size: 0.85em; color: var(--ink-soft); }
+.meta a { color: var(--ink); }

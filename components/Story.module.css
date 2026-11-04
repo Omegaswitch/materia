@@ -1,0 +1,49 @@
+.story {
+  --p: 0;
+  position: relative;
+  overflow: hidden;
+}
+.sheet {
+  min-height: 100svh;
+  padding: clamp(96px, 16vh, 200px) var(--gutter);
+  clip-path: inset(0 0 calc((1 - var(--p)) * 100%) 0);
+  will-change: clip-path;
+}
+.entry {
+  max-width: 34ch;
+  margin-left: clamp(0px, 12vw, 220px);
+}
+.word {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 12vw, 160px);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.pron {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 1.2em 0 3em;
+}
+.body {
+  color: var(--ink-soft);
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: 1.6;
+  margin: 0 0 1.4em;
+}
+.roll {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--paper) 0%, var(--paper-deep) 45%, #cdbd9c 80%, var(--paper-deep) 100%);
+  box-shadow: 0 8px 14px -6px rgba(43, 27, 21, 0.35);
+  transform: translateY(calc(var(--p) * 100cqh - 100%));
+  opacity: calc(1 - var(--p) * var(--p) * var(--p));
+  pointer-events: none;
+}
+.story { container-type: size; }
+.still .sheet { clip-path: none; }
+.still .roll { display: none; }
