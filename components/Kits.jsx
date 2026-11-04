@@ -15,10 +15,10 @@ export default function Kits() {
     </figure>
   );
   return (
-    <section id="kits" className={`wrap ${s.section}`} aria-labelledby="kits-title">
-      <Grow as="h2" id="kits-title" className="head" p={1.3}>{kits.heading}</Grow>
-      <div className={`para ${s.base}`} style={{ '--p': 0.4 }} data-reveal><Kit kit={base} /></div>
-      <div className={`para ${s.rest}`} style={{ '--p': 0.9 }} data-reveal>{rest.map((kit) => <Kit key={kit.id} kit={kit} />)}</div>
+    <section id="kits" className={`wrap page ${s.section}`} aria-labelledby="kits-title">
+      <Grow as="h2" id="kits-title" className="head" p={0.6}>{kits.heading}</Grow>
+      <div className={`para ${s.base}`} style={{ '--p': 0.25 }} data-reveal><Kit kit={base} /></div>
+      <div className={`para ${s.rest}`} style={{ '--p': 0.4 }} data-reveal>{rest.map((kit) => <Kit key={kit.id} kit={kit} />)}</div>
     </section>
   );
 }

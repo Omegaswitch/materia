@@ -16,7 +16,7 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
   const id = 'g' + useId().replace(/[^a-z0-9]/gi, '');
   // 0–1 from the id: stable on server and client
   const h = ([...id].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) % 9973, 7) % 1000) / 1000;
-  const drift = p ?? +(0.35 + h * 0.9).toFixed(2);
+  const drift = p ?? +(0.3 + h * 0.6).toFixed(2);
   const time = duration * (0.85 + h * 0.3);
   const grain = (0.018 + h * 0.016).toFixed(3);
 
@@ -77,8 +77,9 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
   }, [delay, time, vanishBefore]);
 
   return (
-    <Tag ref={ref} className={`grow${drift ? ' para' : ''} ${className}`} style={{ ...style, '--grow': `url(#${id})`, ...(drift ? { '--p': drift } : null) }} {...rest}>
-      <svg className="grow-defs" aria-hidden="true" focusable="false">
+    // class 'seep', not 'grow': Tailwind would read 'grow' as flex-grow: 1
+    <Tag ref={ref} className={`seep${drift ? ' para' : ''} ${className}`} style={{ ...style, '--grow': `url(#${id})`, ...(drift ? { '--p': drift } : null) }} {...rest}>
+      <svg className="seep-defs" aria-hidden="true" focusable="false">
         <filter id={id} x="-5%" y="-20%" width="110%" height="140%" colorInterpolationFilters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency={grain} numOctaves="2" seed={Math.round(h * 997)} result="noise" />
           <feColorMatrix ref={matrix} in="noise" type="matrix" values={`0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP * 0.8}`} result="mask" />
