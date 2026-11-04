@@ -1,0 +1,9 @@
+.section { margin-top: var(--gap); }
+.base { width: min(100%, 1000px); margin: clamp(56px, 7vw, 96px) auto 0; }
+.rest { width: min(100%, 1000px); margin: clamp(56px, 7vw, 96px) auto 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); align-items: end; }
+.kit { margin: 0; }
+.name { margin-top: 20px; text-align: center; font-size: var(--step-lead); }
+@media (max-width: 699px) {
+  .rest { grid-template-columns: 1fr 1fr; }
+  .rest > :first-child { grid-column: 1 / -1; }
+}

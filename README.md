@@ -1,6 +1,6 @@
 # MATERIA
 
-Static Next.js marketing site for the MATERIA keycap set.
+Static Next.js site for GMK CYL Materia (Bowlkeyboards × Aiglatson Studio).
 
 ```bash
 npm install
@@ -8,21 +8,26 @@ npm run dev      # http://localhost:3000
 npm run build    # static site in out/
 ```
 
-## Where to replace things
+## Where to change things
 
-Almost everything lives in **`content.js`**. Any asset with `src: null` shows a labeled placeholder; put the file in `public/assets/` and set `src: '/assets/<file>'`.
+Everything editable is in **`content.js`**.
 
 | What | Where |
 |---|---|
-| Logo | `content.js` → `logo.src` |
-| Keyboard render | `content.js` → `keyboard.image.src` (blank-keycap render) |
-| Colour names, descriptions, callout positions | `content.js` → `keyboard.colors` (`x`/`y` = % position on the image, `side` = label above/below on desktop) |
-| Kitting images | `content.js` → `kitting.items` (one slide each in the horizontal slider; add/remove/reorder freely, `ratio` = aspect ratio) |
-| Renders | `content.js` → `renders.items` (same as kitting, slides follow kitting) |
-| Story copy | `content.js` → `story` (currently placeholder) |
-| Footer vendors, privacy link, contact info | `content.js` → `footer` |
-| Fonts | `app/layout.jsx` (currently IM Fell English as a stand-in; swap for another `next/font/google` font or `next/font/local` with your files in `public/fonts/`) |
-| Wood textures for the blocks | put files in `public/assets/wood/`, list them in `content.js` → `panelTextures`; tune `panelTextureOpacity` / `panelBlockOpacity` |
-| Colours | `app/globals.css` `:root` tokens (and `content.js` → `palette`/`panelColors`) |
+| Name, makers, page description | `site` |
+| Hero line, button, collab badge | `hero` |
+| Dictionary entry | `story` |
+| The five Pantones and their callouts | `colours.items` (`hex` is sampled from the render; `x`/`y` = % position of the key on the render, `side` = where the label sits on desktop) |
+| Colour render | `colours.render` (`public/assets/render-*.webp`) |
+| Kits | `kits.items`: drawn from `rows` until you set `src` to a kitting image |
+| Renders gallery | `renders` (hidden while empty) |
+| Vendors, privacy link, contact info | `footer` |
+| Wood textures | `public/assets/wood/`, colours in `panelColors` |
+| Page colours, type scale | `app/globals.css` `:root` |
+| Font | `app/layout.jsx` (IM Fell English as a stand-in) |
 
-Motion respects `prefers-reduced-motion`: panels start open and nothing animates.
+## How it is built
+
+Every section is a server component; the only client script adds a class when a section scrolls into view.
+The wood drifts and the footer blocks rise on CSS scroll timelines (compositor only, no JS); browsers without them show the still page.
+Motion is off under `prefers-reduced-motion`, and nothing is hidden when JavaScript is off.

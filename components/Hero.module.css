@@ -1,0 +1,18 @@
+.hero { min-height: 100svh; display: grid; grid-template-rows: 1fr auto; justify-items: center; padding-block: 32px 48px; }
+.lockup {
+  align-self: center; display: flex; align-items: center;
+  font-size: var(--step-display); line-height: 1; letter-spacing: 0; color: var(--clay);
+  animation: settle 1s var(--ease) both;
+}
+.block { position: relative; isolation: isolate; color: var(--ink); padding: 0.06em 0.04em 0; margin-inline: -0.02em; background: var(--c); }
+.block::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0.4;
+  background: var(--tex) var(--gx) var(--gy) / 420px auto; mix-blend-mode: multiply;
+}
+.foot { display: grid; justify-items: center; gap: 20px; text-align: center; }
+.badge { width: 40px; height: auto; mix-blend-mode: multiply; }
+.sentence { font-size: var(--step-body); max-width: 36ch; margin-bottom: 8px; }
+@keyframes settle { from { opacity: 0; transform: translateY(12px); } }
+@media (max-width: 599px) {
+  .lockup { font-size: 11vw; }
+}

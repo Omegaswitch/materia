@@ -1,0 +1,11 @@
+.band { margin-top: var(--gap); height: 72svh; display: flex; gap: 6px; overflow: hidden; }
+.col { display: flex; flex-direction: column; gap: 6px; flex-basis: 0; margin-block: -12svh; }
+.plank { min-height: 0; }
+@supports (animation-timeline: view()) {
+  .col { animation: drift linear both; animation-timeline: view(); }
+  @keyframes drift {
+    from { transform: translate3d(0, calc(var(--k) * 10svh), 0); }
+    to { transform: translate3d(0, calc(var(--k) * -10svh), 0); }
+  }
+}
+@media (max-width: 899px) { .band { height: 48svh; } }
