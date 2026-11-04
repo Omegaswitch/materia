@@ -37,11 +37,11 @@
   .label.on { opacity: 1; }
   .label .swatch { vertical-align: -2px; margin-right: 6px; }
   .label .desc { display: block; margin-top: 4px; }
-  .legend { display: none; }
+  .legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; }
 }
 
-.line { fill: none; stroke: var(--ink); stroke-width: 1px; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .9s var(--ease); transition-delay: calc(var(--d) * 140ms); }
-.line.on { stroke-dashoffset: 0; }
+.line { fill: none; stroke: var(--ink); stroke-width: 1px; opacity: 0; transition: opacity .9s var(--ease); transition-delay: calc(var(--d) * 140ms); }
+.line.on { opacity: 1; }
 
 .still :global(.panel-col), .still .marker, .still .label, .still .line { transition: none !important; }
 @media (prefers-reduced-motion: reduce) { .marker, .label, .line { transition: none; } }
