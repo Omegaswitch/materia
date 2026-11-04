@@ -1,7 +1,8 @@
 .hero { min-height: 100svh; display: grid; grid-template-rows: 1fr auto; justify-items: center; padding-block: 32px 48px; }
 .logo { position: relative; align-self: center; width: min(100%, 1100px); }
-.fallback { position: absolute; inset: 0; width: 100%; height: 100%; }
-.foot { display: grid; justify-items: center; gap: 20px; text-align: center; }
+/* The haze margin baked into the image: 16.5% each side, 30% above and below. */
+.logo .spill { position: absolute; left: -16.5%; top: -30%; width: 133%; height: 160%; max-width: none; }
+.foot { position: relative; z-index: 1; display: grid; justify-items: center; gap: 20px; text-align: center; }
 .badge { width: 40px; height: auto; mix-blend-mode: multiply; }
 .sentence { font-size: var(--step-body); max-width: 36ch; margin-bottom: 8px; }
 

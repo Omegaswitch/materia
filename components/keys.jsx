@@ -28,12 +28,14 @@ export function Cap({ k, w = 1, c, className = '' }) {
 export function Board({ rows, label }) {
   const units = Math.max(...rows.map((r) => r.reduce((n, cap) => n + cap.w, 0)));
   return (
-    <div className="board" role="img" aria-label={label} style={{ '--n': Math.max(units, 10) }}>
-      {rows.map((row, i) => (
-        <div className="board-row" key={i}>
-          {row.map((cap, j) => <Cap key={j} {...cap} />)}
-        </div>
-      ))}
+    <div className="board-box" role="img" aria-label={label} style={{ '--n': Math.max(units, 10) }}>
+      <div className="board">
+        {rows.map((row, i) => (
+          <div className="board-row" key={i}>
+            {row.map((cap, j) => <Cap key={j} {...cap} />)}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

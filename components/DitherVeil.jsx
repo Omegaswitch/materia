@@ -431,6 +431,11 @@ const DitherVeil = ({
     } catch {
       return undefined; // materia: no WebGL, the fallback image stays
     }
+    // materia: the shaders are WebGL2 (#version 300 es); on WebGL1 leave the fallback image alone
+    if (!renderer.isWebgl2) {
+      renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return undefined;
+    }
     const gl = renderer.gl;
     const canvas = gl.canvas;
     canvas.style.display = 'block';
@@ -440,6 +445,8 @@ const DitherVeil = ({
     canvas.style.opacity = '0';
     canvas.style.transition = reducedMotion ? 'none' : 'opacity 0.7s ease';
     container.appendChild(canvas);
+    // materia: a lost context (e.g. iOS after backgrounding) shows the fallback image instead of a blank canvas
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); canvas.style.opacity = '0'; });
 
     const floatMask = renderer.isWebgl2 && !!renderer.getExtension('EXT_color_buffer_float');
     const geometry = new Triangle(gl);
@@ -659,7 +666,7 @@ const DitherVeil = ({
         burstData[i * 4 + 3] = 1 - k * k * k;
       });
 
-      if (presence > 0.002) trailUntil = now + s.linger * 1000 + 150;
+      // materia: the trail is kept alive by pointer movement (onMove/onLeave), not by the pointer merely resting inside
 
       const minFade = floatMask ? 0 : 1.5 / 255;
       const fade = s.linger > 0 ? dt / s.linger : 1;
@@ -724,8 +731,9 @@ const DitherVeil = ({
       renderer.render({ scene: viewMesh });
       if (image) canvas.style.opacity = '1'; // materia
 
-      const busy =
-        pointer.inside || wanderOn || presence > 0.002 || bursts.length > 0 || now < trailUntil || (image && intro < 1);
+      // materia: render only while something changes; a resting pointer no longer redraws every frame
+      const settling = Math.abs((pointer.inside || wanderOn ? 1 : 0) - presence) > 0.002;
+      const busy = wanderOn || settling || bursts.length > 0 || now < trailUntil || (image && intro < 1);
       if (busy && visible) raf = requestAnimationFrame(frame);
     };
 
@@ -760,8 +768,18 @@ const DitherVeil = ({
       pointer.y = e.clientY - rect.top;
       pointer.placed = true;
     };
+    const keepTrail = () => {
+      trailUntil = performance.now() + (settingsRef.current?.linger ?? 1) * 1000 + 300;
+    };
+    let lastX = NaN;
+    let lastY = NaN;
     const onMove = e => {
+      // materia: scrolling under a resting mouse sends moves with an unchanged screen position; nothing to reveal
+      if (e.type !== 'pointerdown' && e.clientX === lastX && e.clientY === lastY) return;
+      lastX = e.clientX;
+      lastY = e.clientY;
       locate(e);
+      keepTrail();
       if (!pointer.inside) {
         pointer.inside = true;
         pointer.fresh = true;
@@ -770,9 +788,11 @@ const DitherVeil = ({
     };
     const onLeave = () => {
       pointer.inside = false;
+      keepTrail();
       wake();
     };
     const onDown = e => {
+      lastX = NaN;
       onMove(e);
       if (!settingsRef.current?.clickBurst || (e.pointerType === 'mouse' && e.button !== 0)) return;
       bursts.push({ x: pointer.x, y: pointer.y, start: performance.now() });

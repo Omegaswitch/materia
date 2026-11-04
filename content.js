@@ -13,7 +13,8 @@ export const hero = {
   action: { label: 'Find a vendor', href: '#vendors' },
   badge: { src: '/assets/badge.webp', alt: 'Bowlkeyboards and Aiglatson Studio', w: 80, h: 145 },
   // The deck's lockup. Shown dithered in brown; the pointer reveals it in full colour.
-  logo: { src: '/assets/logo.webp', alt: 'GMK CYL Materia', w: 1360, h: 492 },
+  // The image has a faint grain haze around the lockup so the dither thins out into the page instead of stopping at an edge.
+  logo: { src: '/assets/logo.webp', small: '/assets/logo-900.webp', alt: 'GMK CYL Materia', w: 1808, h: 788, frame: [1360, 492] },
 };
 
 export const story = {
@@ -67,7 +68,7 @@ export const footer = {
     { name: 'Vendor 2', href: '#' },
     { name: 'Vendor 3', href: '#' },
   ],
-  privacy: { label: 'Privacy policy', href: '#' },
+  privacy: { label: 'Privacy policy', href: '/privacy/' },
   info: ['PLACEHOLDER: contact address', 'PLACEHOLDER: other site information'],
 };
 
@@ -75,3 +76,18 @@ export const footer = {
 export const panelTextures = Array.from({ length: 10 }, (_, i) => `/assets/wood/w${i + 1 < 10 ? '0' : ''}${i + 1}.webp`);
 // Plank colours, by colour id above.
 export const panelColors = ['p7591', 'p7592', 'p7593', 'p7594'];
+
+// Privacy policy page (/privacy/). Checked against the built site: no cookies, no storage, no third-party requests.
+// Run by Bowlkeyboards and Aiglatson Studio, hosted on Vercel. PLACEHOLDER: a contact address. Have it read over before launch.
+export const privacy = {
+  title: 'Privacy policy',
+  updated: '4 November 2026',
+  sections: [
+    { h: 'Who runs this site', p: 'This site is run by Bowlkeyboards and Aiglatson Studio, who make GMK CYL Materia together.' },
+    { h: 'What this site collects', p: 'Nothing. There are no accounts, forms, cookies, analytics or advertising on this site, and it does not track you or store anything in your browser.' },
+    { h: 'What your browser loads', p: 'Every page, font, image and script comes from this site itself. Nothing is requested from anyone else while you browse it.' },
+    { h: 'Hosting', p: 'The site is hosted by Vercel, which may keep ordinary server logs (IP address, browser, the page asked for and the time) to keep it secure and running.', link: { label: 'Vercel’s privacy policy', href: 'https://vercel.com/legal/privacy-policy' } },
+    { h: 'Vendors', p: 'Vendor links take you to other shops. Once you follow one, that shop’s own privacy policy applies.' },
+    { h: 'Questions', p: 'PLACEHOLDER: contact address for privacy questions.' },
+  ],
+};

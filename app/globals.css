@@ -35,7 +35,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* The meander from the deck, down both edges of the page. */
 body::before, body::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: var(--border); pointer-events: none;
+  content: ''; position: absolute; z-index: 3; top: 0; bottom: 0; width: var(--border); pointer-events: none;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 148 167'%3E%3Cg transform='translate%28148 0%29 rotate%2890%29'%3E%3Cpath d='M0 143H167 M5 143V12Q5 5 12 5H126Q133 5 133 12V101Q133 108 126 108H35Q28 108 28 101V45Q28 38 35 38H101Q108 38 108 45V65Q108 72 101 72H50' fill='none' stroke='%232b1b15' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100% auto repeat-y;
 }
 body::before { left: 0; }
@@ -44,29 +44,35 @@ body::after { right: 0; transform: scaleX(-1); }
 /* Text grows out of the page (components/Grow.jsx). Without JS or with reduced motion it is plain text. */
 .grow-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .js .grow:not(.grown) { filter: var(--grow); }
+.js .grow.fade { filter: none; transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.js .grow.fade:not(.grown) { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .js .grow:not(.grown) { filter: none; } }
 .head { font-size: var(--step-head); text-align: center; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* A button is a small keycap: a flat top over a darker lip. */
+/* The button is a small wooden plaque with a carved frame, like the deck's badge. */
 .btn {
-  --c: var(--ink);
-  display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px 3px;
-  background: var(--c); color: var(--paper); text-decoration: none; font-size: var(--step-body);
-  border-radius: var(--radius); border-bottom: 5px solid color-mix(in oklab, var(--c) 60%, #000);
-  transition: transform 0.15s var(--ease), background-color 0.2s;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 2px 34px 0;
+  background: #673933 url(/assets/wood/plaque.webp) center / cover no-repeat;
+  color: var(--paper); text-decoration: none; font-size: var(--step-body); letter-spacing: 0.02em;
+  border-radius: 3px;
+  outline: 1px solid rgb(236 228 206 / 0.45); outline-offset: -6px;
+  transition: transform 0.5s var(--ease), filter 0.5s var(--ease), outline-offset 0.5s var(--ease);
 }
-.btn:hover { background: color-mix(in oklab, var(--c) 85%, var(--paper)); }
-.btn:active { transform: translateY(2px); }
+.btn:hover { transform: translateY(-2px); filter: brightness(1.1) saturate(1.05); outline-offset: -8px; text-decoration: none; }
+.btn:active { transform: translateY(1px); transition-duration: 0.1s; }
+.btn:focus-visible { outline: 2px solid var(--paper); outline-offset: -6px; box-shadow: 0 0 0 3px var(--rust-ink); }
 
 /* ---------- Drawn keycaps (kits). Legends are white sans, as on the GMK caps. ---------- */
-.board { container-type: inline-size; display: grid; gap: calc(100cqi / var(--n) * 0.06); }
+.board-box { container-type: inline-size; }
+.board { display: grid; gap: calc(100cqi / var(--n) * 0.06); }
 .board-row { display: flex; gap: calc(100cqi / var(--n) * 0.06); }
 .cap {
   --u: calc(100cqi / var(--n, 15));
   position: relative; display: block; flex: none;
   width: calc(var(--w, 1) * var(--u) - var(--u) * 0.06); height: calc(var(--u) * 0.94);
   border-radius: calc(var(--u) * 0.1);
+  background: var(--c);
   background: color-mix(in oklab, var(--c) 70%, #120806);
 }
 .cap-top {
@@ -82,6 +88,7 @@ body::after { right: 0; transform: scaleX(-1); }
   background: var(--c) var(--tex) center / cover no-repeat;
   background-blend-mode: multiply;
 }
+.js [data-lazy]:not(.in) .wood { background-image: none; } /* textures wait until the band is near */
 
 /* ---------- Parallax between sections: each layer drifts at its own rate (--p) as it crosses the screen.
    Compositor-only scroll timelines; browsers without them, and reduced motion, get the still page. ---------- */
@@ -94,11 +101,11 @@ body::after { right: 0; transform: scaleX(-1); }
 }
 
 /* ---------- Entrances: parts of a section rise in turn, once. Only when JS runs (html.js). ---------- */
-.js [data-reveal] > * { opacity: 0; transform: translateY(20px); }
+.js [data-reveal] > * { opacity: 0; transform: translateY(32px) scale(0.985); }
 .js [data-reveal].in > * {
   opacity: 1; transform: none;
-  transition: opacity 0.8s var(--ease), transform 1s var(--ease);
-  transition-delay: calc(var(--i, 0) * 90ms);
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 140ms);
 }
 [data-reveal] > :nth-child(2) { --i: 1; }
 [data-reveal] > :nth-child(3) { --i: 2; }

@@ -27,8 +27,9 @@
 /* Phone: the board, then the five colours as a list with a swatch each. */
 @media (max-width: 899px) {
   .figure { margin-top: 40px; }
-  .callouts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 32px; }
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px 24px; margin-top: 32px; }
   .label { text-align: left; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; align-items: center; }
   .num { grid-column: 2; }
+  .label { white-space: normal; }
   .swatch { display: block; grid-row: span 2; width: 28px; height: 28px; border-radius: 4px; background: var(--c); border-bottom: 4px solid color-mix(in oklab, var(--c) 60%, #000); }
 }
