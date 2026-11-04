@@ -20,6 +20,7 @@ export default function Story() {
       // 0 when the top enters the viewport bottom, 1 when it reaches ~15% from the top.
       const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.85)));
       el.style.setProperty('--p', p.toFixed(4));
+      el.style.setProperty('--y', `${(p * r.height).toFixed(1)}px`);
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();

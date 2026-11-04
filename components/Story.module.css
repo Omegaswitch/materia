@@ -40,10 +40,9 @@
   height: 28px;
   background: linear-gradient(to bottom, var(--paper) 0%, var(--paper-deep) 45%, #cdbd9c 80%, var(--paper-deep) 100%);
   box-shadow: 0 8px 14px -6px rgba(43, 27, 21, 0.35);
-  transform: translateY(calc(var(--p) * 100cqh - 100%));
+  transform: translateY(calc(var(--y, 0px) - 100%));
   opacity: calc(1 - var(--p) * var(--p) * var(--p));
   pointer-events: none;
 }
-.story { container-type: size; }
 .still .sheet { clip-path: none; }
 .still .roll { display: none; }
