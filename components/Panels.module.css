@@ -69,3 +69,10 @@
 /* Scroll-driven mode (amount prop): each block leaves at its own point of the 0→1 range. */
 .scrub .slot { transition: none; transform: translateY(calc(var(--dir) * 135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }
 .scrub .square { transform: translateY(calc(var(--dir) * -135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))) rotate(calc(var(--dir) * 9deg * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }
+
+/* Touch devices: keep the wood still inside each block (no pan, no sheen, no blending) to save the GPU. */
+@media (pointer: coarse) {
+  .wood::before { display: none; }
+  .wood::after { animation: none; mix-blend-mode: normal; opacity: calc(var(--tex-o) * 0.55); }
+  .slot { will-change: auto; }
+}

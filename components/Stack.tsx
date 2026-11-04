@@ -7,11 +7,16 @@ export default function Stack({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const pages = Array.from(ref.current?.children ?? []) as HTMLElement[];
-    const fit = () => pages.forEach((p) => (p.style.top = `${Math.min(0, innerHeight - p.offsetHeight)}px`));
+    // Use the small viewport height (address bar shown) and ignore height-only resizes,
+    // so pages don't jump when a phone's address bar slides in and out.
+    let vw = innerWidth;
+    let vh = innerHeight;
+    const fit = () => pages.forEach((p) => (p.style.top = `${Math.min(0, vh - p.offsetHeight)}px`));
+    const onResize = () => { if (innerWidth !== vw) { vw = innerWidth; vh = innerHeight; fit(); } };
     const ro = new ResizeObserver(fit);
     pages.forEach((p) => ro.observe(p));
-    addEventListener('resize', fit);
-    return () => { ro.disconnect(); removeEventListener('resize', fit); };
+    addEventListener('resize', onResize);
+    return () => { ro.disconnect(); removeEventListener('resize', onResize); };
   }, []);
   return <div ref={ref} className="stack">{children}</div>;
 }

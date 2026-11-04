@@ -17,6 +17,9 @@ export default function WoodScroll() {
     const el = ref.current;
     if (reduced || !el) return;
     let edges: number[] = [];
+    // Stable viewport: only re-measure on width change (phone address bars change height constantly).
+    let vw = innerWidth;
+    let vh = innerHeight;
     const measure = () => {
       // Pages sit one after another, so boundaries are cumulative heights (sticky pages make rects unreliable).
       const pages = document.querySelectorAll<HTMLElement>('.stack > *, [data-slides], footer');
@@ -26,26 +29,26 @@ export default function WoodScroll() {
         if (i) edges.push(top);
         const n = Number(p.dataset.slides || 0);
         // Inside the horizontal slider: a boundary between every pair of slides.
-        const step = n > 1 ? (p.offsetHeight - innerHeight) / (n - 1) : 0;
-        for (let k = 0; k < n - 1; k++) edges.push(top + (k + 0.5) * step + innerHeight / 2);
+        const step = n > 1 ? (p.offsetHeight - vh) / (n - 1) : 0;
+        for (let k = 0; k < n - 1; k++) edges.push(top + (k + 0.5) * step + vh / 2);
         top += p.offsetHeight;
       });
     };
     let raf = 0;
     const update = () => {
       raf = 0;
-      const mid = scrollY + innerHeight / 2;
-      const d = Math.min(...edges.map((e) => Math.abs(mid - e) / innerHeight), Infinity);
+      const mid = scrollY + vh / 2;
+      const d = Math.min(...edges.map((e) => Math.abs(mid - e) / vh), Infinity);
       el.style.setProperty('--amt', String(Math.min(1, Math.max(0, d / BAND))));
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    const onResize = () => { measure(); update(); };
+    const onResize = () => { if (innerWidth !== vw) { vw = innerWidth; vh = innerHeight; } measure(); update(); };
     measure(); update();
     addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', onResize);
+    // Content height changes (fonts, images) re-measure; window resizes go through the width check.
     const ro = new ResizeObserver(onResize);
     ro.observe(document.body);
-    return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onResize); ro.disconnect(); cancelAnimationFrame(raf); };
+    return () => { removeEventListener('scroll', onScroll); ro.disconnect(); cancelAnimationFrame(raf); };
   }, [reduced]);
 
   if (reduced) return null;
