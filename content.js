@@ -17,7 +17,16 @@ export const panelColors = ['bark', 'rust', 'clay'];
 // Wood photo textures for the blocks: put files in public/assets/wood/ and list them here.
 // Each block picks one (by seed) and layers it semi-transparently over its palette colour.
 export const panelTextures = [
-  // '/assets/wood/wood-01.jpg',
+  '/assets/wood/w01.webp',
+  '/assets/wood/w02.webp',
+  '/assets/wood/w03.webp',
+  '/assets/wood/w04.webp',
+  '/assets/wood/w05.webp',
+  '/assets/wood/w06.webp',
+  '/assets/wood/w07.webp',
+  '/assets/wood/w08.webp',
+  '/assets/wood/w09.webp',
+  '/assets/wood/w10.webp',
 ];
 // How strongly the texture shows (0–1), and how see-through the blocks are where they overlap (0–1).
 export const panelTextureOpacity = 0.55;

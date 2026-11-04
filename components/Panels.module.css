@@ -41,7 +41,7 @@
 .wood::after {
   content: ''; position: absolute; inset: 0;
   background-image: var(--tex, none);
-  background-size: 700px auto;
+  background-size: max(700px, 100%) auto;
   background-position: var(--gx) var(--gy);
   mix-blend-mode: multiply;
   opacity: var(--tex-o);
