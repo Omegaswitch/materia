@@ -59,8 +59,12 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
       frame = 0;
       if (!target || !el.classList.contains('grown') && !el.dataset.vanishing) return;
       const rest = Math.max(40, (top(el) - top(target) - target.offsetHeight) * 0.9);
-      const gap = el.getBoundingClientRect().top - target.getBoundingClientRect().bottom;
-      const q = Math.min(1, Math.max(0, gap / rest));
+      const now = el.getBoundingClientRect().top;
+      const gap = now - target.getBoundingClientRect().bottom;
+      // and fully gone by the time it reaches the top 30% of the screen, even once the logo stops drifting
+      const line = innerHeight * 0.3;
+      const travel = Math.max(1, top(el) - line);
+      const q = Math.min(1, Math.max(0, Math.min(gap / rest, (now - line) / travel * 1.6)));
       if (q >= 1) { delete el.dataset.vanishing; el.classList.add('grown'); el.style.opacity = ''; return; }
       el.dataset.vanishing = '1';
       if (fade) { el.style.opacity = String(q); return; }
