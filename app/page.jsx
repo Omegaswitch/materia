@@ -6,16 +6,17 @@ import Kits from '../components/Kits';
 import Gallery from '../components/Gallery';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Hold from '../components/Hold';
 
 export default function Page() {
   return (
     <>
       <main>
         <Hero />
-        <Story />
-        <Colours />
+        <Hold><Story /></Hold>
+        <Hold><Colours /></Hold>
         <Planks />
-        <Kits />
+        <Hold><Kits /></Hold>
         <Gallery />
       </main>
       <Footer />
