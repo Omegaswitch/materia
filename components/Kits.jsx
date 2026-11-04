@@ -13,9 +13,9 @@ export default function Kits() {
   );
   return (
     <section id="kits" className={`wrap ${s.section}`} aria-labelledby="kits-title">
-      <h2 id="kits-title" className="head">{kits.heading}</h2>
-      <div className={s.base} data-reveal><Kit kit={base} /></div>
-      <div className={s.rest} data-reveal>{rest.map((kit) => <Kit key={kit.id} kit={kit} />)}</div>
+      <h2 id="kits-title" className="head para" style={{ '--p': 1.4 }}>{kits.heading}</h2>
+      <div className={`para ${s.base}`} style={{ '--p': 0.4 }} data-reveal><Kit kit={base} /></div>
+      <div className={`para ${s.rest}`} style={{ '--p': 0.9 }} data-reveal>{rest.map((kit) => <Kit key={kit.id} kit={kit} />)}</div>
     </section>
   );
 }

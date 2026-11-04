@@ -65,9 +65,18 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* ---------- Wood: a palette colour with one photo texture multiplied in, painted once ---------- */
 .wood {
-  background-color: var(--c); background-image: var(--tex);
-  background-size: 640px auto; /* textures are 640px wide */ background-position: var(--gx, 0) var(--gy, 0);
+  background: var(--c) var(--tex) center / cover no-repeat;
   background-blend-mode: multiply;
+}
+
+/* ---------- Parallax between sections: each layer drifts at its own rate (--p) as it crosses the screen.
+   Compositor-only scroll timelines; browsers without them, and reduced motion, get the still page. ---------- */
+@supports (animation-timeline: view()) {
+  .para { animation: para linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes para {
+    from { translate: 0 calc(var(--p, 1) * 7vh); }
+    to { translate: 0 calc(var(--p, 1) * -7vh); }
+  }
 }
 
 /* ---------- Entrances: parts of a section rise in turn, once. Only when JS runs (html.js). ---------- */

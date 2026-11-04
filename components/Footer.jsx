@@ -1,18 +1,17 @@
-import { woodStyle } from './Panels';
 import { Legend } from './keys';
-import { footer, site, hero, panelColors } from '../content';
+import { footer, site, hero } from '../content';
 import s from './Footer.module.css';
 
 const HEIGHTS = [100, 72, 88, 64, 94, 70, 82];
 
-// The name closes the page, each letter cut into its own block of wood.
+// The name closes the page, each letter cut into its own single piece of wood (public/assets/wood/letters/).
 export default function Footer() {
   return (
     <footer id="vendors" className={`wrap ${s.footer}`}>
       <h2 className={s.mark}>
         {[...site.name].map((ch, i) => (
-          <span key={i} aria-hidden="true" className={`wood ${s.block}`}
-            style={{ height: `${HEIGHTS[i % HEIGHTS.length]}%`, '--i': i, ...woodStyle(panelColors[i % panelColors.length], i + 3) }}>
+          <span key={i} aria-hidden="true" className={s.block} style={{ height: `${HEIGHTS[i % HEIGHTS.length]}%`, '--i': i }}>
+            <img src={`/assets/wood/letters/l${i + 1}.webp`} alt="" width="520" height="780" loading="lazy" decoding="async" />
             <Legend ch={ch} />
           </span>
         ))}
