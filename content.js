@@ -14,6 +14,15 @@ export const palette = {
 // Panel colours used by every moving block field, in palette keys.
 export const panelColors = ['bark', 'rust', 'clay'];
 
+// Wood photo textures for the blocks: put files in public/assets/wood/ and list them here.
+// Each block picks one (by seed) and layers it semi-transparently over its palette colour.
+export const panelTextures = [
+  // '/assets/wood/wood-01.jpg',
+];
+// How strongly the texture shows (0–1), and how see-through the blocks are where they overlap (0–1).
+export const panelTextureOpacity = 0.55;
+export const panelBlockOpacity = 0.94;
+
 export const logo = {
   src: null,
   alt: 'MATERIA logo',

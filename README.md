@@ -22,6 +22,7 @@ Almost everything lives in **`content.js`**. Any asset with `src: null` shows a 
 | Story copy | `content.js` → `story` (currently placeholder) |
 | Footer vendors, privacy link, contact info | `content.js` → `footer` |
 | Fonts | `app/layout.jsx` (currently IM Fell English as a stand-in; swap for another `next/font/google` font or `next/font/local` with your files in `public/fonts/`) |
+| Wood textures for the blocks | put files in `public/assets/wood/`, list them in `content.js` → `panelTextures`; tune `panelTextureOpacity` / `panelBlockOpacity` |
 | Colours | `app/globals.css` `:root` tokens (and `content.js` → `palette`/`panelColors`) |
 
 Motion respects `prefers-reduced-motion`: panels start open and nothing animates.

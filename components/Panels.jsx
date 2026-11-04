@@ -1,4 +1,4 @@
-import { panelColors } from '../content';
+import { panelColors, panelTextures, panelTextureOpacity, panelBlockOpacity } from '../content';
 import styles from './Panels.module.css';
 
 // Seeded PRNG: identical output on server and client (no Math.random at render).
@@ -39,7 +39,10 @@ function Wood({ color, across, gx, gy, className = '' }) {
   return (
     <div
       className={`${styles.wood} ${across ? styles.across : ''} ${className}`}
-      style={{ '--wood': `var(--${color})`, '--gx': `${gx}px`, '--gy': `${gy}px` }}
+      style={{
+        '--wood': `var(--${color})`, '--gx': `${gx}px`, '--gy': `${gy}px`,
+        ...(panelTextures.length && { '--tex': `url(${panelTextures[(gx + gy) % panelTextures.length]})` }),
+      }}
     />
   );
 }
@@ -50,7 +53,11 @@ function Wood({ color, across, gx, gy, className = '' }) {
  */
 export default function Panels({ open = false, columns = 5, seed = 1 }) {
   return (
-    <div className={`${styles.panels}${open ? ` ${styles.open}` : ''}`} aria-hidden="true">
+    <div
+      className={`${styles.panels}${open ? ` ${styles.open}` : ''}`}
+      style={{ '--tex-o': panelTextureOpacity, '--block-o': panelBlockOpacity }}
+      aria-hidden="true"
+    >
       {layout(columns, seed).map(({ shift, blocks, i }) => (
         <div className={styles.col} key={i} style={{ '--shift': `${shift}%` }}>
           {blocks.map((b, j) => {
