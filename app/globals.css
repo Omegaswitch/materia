@@ -35,7 +35,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* The meander from the deck, down both edges of the page. */
 body::before, body::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: var(--border); pointer-events: none;
+  content: ''; position: absolute; z-index: 3; top: 0; bottom: 0; width: var(--border); pointer-events: none;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 148 167'%3E%3Cg transform='translate%28148 0%29 rotate%2890%29'%3E%3Cpath d='M0 143H167 M5 143V12Q5 5 12 5H126Q133 5 133 12V101Q133 108 126 108H35Q28 108 28 101V45Q28 38 35 38H101Q108 38 108 45V65Q108 72 101 72H50' fill='none' stroke='%232b1b15' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100% auto repeat-y;
 }
 body::before { left: 0; }
