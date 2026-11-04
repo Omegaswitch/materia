@@ -1,0 +1,6 @@
+.page { max-width: calc(40rem + 2 * var(--gutter)); margin: 0 auto; padding-block: 48px var(--gap); }
+.back { display: inline-block; margin-bottom: clamp(64px, 10vw, 140px); font-size: var(--step-small); }
+.title { font-size: var(--step-head); margin-bottom: 16px; }
+.updated { font-size: var(--step-small); color: var(--rust-ink); margin-bottom: 56px; }
+.section + .section { margin-top: 40px; }
+.h { font-size: var(--step-lead); margin-bottom: 12px; }
