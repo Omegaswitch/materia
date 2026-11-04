@@ -19,7 +19,7 @@ export default function Planks({ columns = 7, seed = 5 }) {
   const rnd = rng(seed);
   let n = 0;
   return (
-    <div className={`para ${s.band}`} style={{ '--p': -0.8 }} aria-hidden="true">
+    <div className={`para ${s.band}`} style={{ '--p': -0.8 }} aria-hidden="true" data-lazy>
       {Array.from({ length: columns }, (_, i) => {
         const style = { '--k': (rnd() * 2 - 1).toFixed(2), flexGrow: (0.6 + rnd()).toFixed(2) };
         const count = 2 + Math.floor(rnd() * 3);

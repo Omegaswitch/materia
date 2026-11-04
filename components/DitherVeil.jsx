@@ -431,6 +431,11 @@ const DitherVeil = ({
     } catch {
       return undefined; // materia: no WebGL, the fallback image stays
     }
+    // materia: the shaders are WebGL2 (#version 300 es); on WebGL1 leave the fallback image alone
+    if (!renderer.isWebgl2) {
+      renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return undefined;
+    }
     const gl = renderer.gl;
     const canvas = gl.canvas;
     canvas.style.display = 'block';
@@ -440,6 +445,8 @@ const DitherVeil = ({
     canvas.style.opacity = '0';
     canvas.style.transition = reducedMotion ? 'none' : 'opacity 0.7s ease';
     container.appendChild(canvas);
+    // materia: a lost context (e.g. iOS after backgrounding) shows the fallback image instead of a blank canvas
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); canvas.style.opacity = '0'; });
 
     const floatMask = renderer.isWebgl2 && !!renderer.getExtension('EXT_color_buffer_float');
     const geometry = new Triangle(gl);

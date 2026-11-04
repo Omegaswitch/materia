@@ -44,6 +44,8 @@ body::after { right: 0; transform: scaleX(-1); }
 /* Text grows out of the page (components/Grow.jsx). Without JS or with reduced motion it is plain text. */
 .grow-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .js .grow:not(.grown) { filter: var(--grow); }
+.js .grow.fade { filter: none; transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.js .grow.fade:not(.grown) { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .js .grow:not(.grown) { filter: none; } }
 .head { font-size: var(--step-head); text-align: center; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -62,13 +64,15 @@ body::after { right: 0; transform: scaleX(-1); }
 .btn:focus-visible { outline: 2px solid var(--paper); outline-offset: -6px; box-shadow: 0 0 0 3px var(--rust-ink); }
 
 /* ---------- Drawn keycaps (kits). Legends are white sans, as on the GMK caps. ---------- */
-.board { container-type: inline-size; display: grid; gap: calc(100cqi / var(--n) * 0.06); }
+.board-box { container-type: inline-size; }
+.board { display: grid; gap: calc(100cqi / var(--n) * 0.06); }
 .board-row { display: flex; gap: calc(100cqi / var(--n) * 0.06); }
 .cap {
   --u: calc(100cqi / var(--n, 15));
   position: relative; display: block; flex: none;
   width: calc(var(--w, 1) * var(--u) - var(--u) * 0.06); height: calc(var(--u) * 0.94);
   border-radius: calc(var(--u) * 0.1);
+  background: var(--c);
   background: color-mix(in oklab, var(--c) 70%, #120806);
 }
 .cap-top {
@@ -84,6 +88,7 @@ body::after { right: 0; transform: scaleX(-1); }
   background: var(--c) var(--tex) center / cover no-repeat;
   background-blend-mode: multiply;
 }
+.js [data-lazy]:not(.in) .wood { background-image: none; } /* textures wait until the band is near */
 
 /* ---------- Parallax between sections: each layer drifts at its own rate (--p) as it crosses the screen.
    Compositor-only scroll timelines; browsers without them, and reduced motion, get the still page. ---------- */

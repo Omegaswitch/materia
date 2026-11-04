@@ -22,7 +22,11 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
+    window.__live = true;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.classList.add('grown'); return undefined; }
+    // WebKit (Safari, every iOS browser) runs SVG filters on the CPU: a soft fade there instead of the growth.
+    const fade = 'GestureEvent' in window;
+    if (fade) el.classList.add('fade');
     let raf = 0;
     let start = 0;
     const set = (q) => {
@@ -41,7 +45,8 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      raf = requestAnimationFrame(tick);
+      if (fade) setTimeout(() => el.classList.add('grown'), delay);
+      else raf = requestAnimationFrame(tick);
     });
     io.observe(el);
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
@@ -51,7 +56,7 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
     <Tag ref={ref} className={`grow${drift ? ' para' : ''} ${className}`} style={{ ...style, '--grow': `url(#${id})`, ...(drift ? { '--p': drift } : null) }} {...rest}>
       <svg className="grow-defs" aria-hidden="true" focusable="false">
         <filter id={id} x="-5%" y="-20%" width="110%" height="140%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency={grain} numOctaves="3" seed={Math.round(h * 997)} result="noise" />
+          <feTurbulence type="fractalNoise" baseFrequency={grain} numOctaves="2" seed={Math.round(h * 997)} result="noise" />
           <feColorMatrix ref={matrix} in="noise" type="matrix" values={`0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP * 0.8}`} result="mask" />
           <feDisplacementMap ref={warp} in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G" result="warped" />
           <feComposite in="warped" in2="mask" operator="in" />

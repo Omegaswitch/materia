@@ -20,7 +20,7 @@ export default function HeroLogo() {
   return (
     // The h1 is the lockup's own size; the picture and its veil spill past it on every side.
     <h1 className={s.logo} style={{ aspectRatio: `${logo.frame[0]} / ${logo.frame[1]}` }}>
-      <img src={logo.src} alt={logo.alt} width={logo.w} height={logo.h} fetchPriority="high" className={s.spill} />
+      <img src={logo.src} alt={logo.alt} width={logo.w} height={logo.h} srcSet={`${logo.small} 900w, ${logo.src} ${logo.w}w`} sizes="(max-width: 700px) 100vw, 1500px" fetchPriority="high" className={s.spill} />
       <DitherVeil
         src={logo.src}
         pattern="floyd"

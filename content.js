@@ -14,7 +14,7 @@ export const hero = {
   badge: { src: '/assets/badge.webp', alt: 'Bowlkeyboards and Aiglatson Studio', w: 80, h: 145 },
   // The deck's lockup. Shown dithered in brown; the pointer reveals it in full colour.
   // The image has a faint grain haze around the lockup so the dither thins out into the page instead of stopping at an edge.
-  logo: { src: '/assets/logo.webp', alt: 'GMK CYL Materia', w: 1808, h: 788, frame: [1360, 492] },
+  logo: { src: '/assets/logo.webp', small: '/assets/logo-900.webp', alt: 'GMK CYL Materia', w: 1808, h: 788, frame: [1360, 492] },
 };
 
 export const story = {

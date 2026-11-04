@@ -12,8 +12,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={text.variable}>
       <head>
-        {/* Entrance animations only apply when JS runs, so content is never stuck hidden. */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Entrance states only apply while JS runs. If the app has not started within 4 s (blocked or failed chunks), they are dropped so nothing stays hidden. */}
+        <script dangerouslySetInnerHTML={{ __html: "var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!window.__live)d.classList.remove('js')},4000)" }} />
       </head>
       <body>{children}</body>
     </html>
