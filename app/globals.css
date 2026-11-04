@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Colour tokens mirror content.js `palette` — change both together. */
 :root {
   --bark: #5b3a31;
@@ -85,3 +87,11 @@ a { color: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
 }
+
+/* ---------- Stacked pages (components/Stack.tsx) ---------- */
+.stack > * {
+  position: sticky; top: 0; min-height: 100svh;
+  background-color: var(--paper);
+  box-shadow: 0 -18px 40px -24px rgb(43 27 21 / 0.45);
+}
+@media (prefers-reduced-motion: reduce) { .stack > * { position: relative; top: auto !important; } }

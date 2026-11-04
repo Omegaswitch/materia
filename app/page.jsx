@@ -1,21 +1,23 @@
 import Landing from '../components/Landing';
 import Story from '../components/Story';
 import Keyboard from '../components/Keyboard';
-import Gallery from '../components/Gallery';
+import Slides from '../components/Slides';
 import Footer from '../components/Footer';
-import { kitting, renders } from '../content';
+import Stack from '../components/Stack';
+import SmoothScroll from '../components/SmoothScroll';
 
 export default function Page() {
   return (
-    <>
+    <SmoothScroll>
       <main>
-        <Landing />
-        <Story />
-        <Keyboard />
-        <Gallery id="kitting" {...kitting} />
-        <Gallery id="renders" {...renders} />
+        <Stack>
+          <Landing />
+          <Story />
+          <Keyboard />
+        </Stack>
+        <Slides />
       </main>
       <Footer />
-    </>
+    </SmoothScroll>
   );
 }
