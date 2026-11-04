@@ -1,0 +1,71 @@
+/* Flat palette blocks; an uploaded texture (content.js panelTextures) is multiplied over the colour. */
+.panels {
+  position: absolute; inset: 0;
+  display: flex; overflow: hidden;
+  pointer-events: none;
+  container-type: size;
+}
+.col {
+  flex: 1; position: relative;
+  display: flex; flex-direction: column;
+  margin-top: calc(var(--shift) - 40px); margin-bottom: -18%;
+  margin-inline: -4px;
+}
+.slot {
+  position: relative; min-height: 0; flex-shrink: 1;
+  margin-top: -32px; /* layered overlap */
+  margin-inline: -4px;
+  translate: var(--nudge) 0;
+  transition: transform 1.4s var(--ease) var(--stag);
+  will-change: transform;
+}
+.square { aspect-ratio: 1; flex: 0 0 auto; }
+.slot:first-child { margin-top: 0; }
+.slot:last-child { flex-grow: 3 !important; min-height: 40%; }
+.bob {
+  position: absolute; inset: 0;
+  display: flex;
+  animation: rise var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+@keyframes rise {
+  from { transform: translate3d(0, calc(var(--amp) * -1), 0); }
+  to { transform: translate3d(0, var(--amp), 0); }
+}
+.wood {
+  flex: 1; position: relative; overflow: hidden;
+  background-color: var(--wood);
+  opacity: var(--block-o);
+  box-shadow: inset 0 1px 0 rgb(255 240 220 / 0.12), 0 8px 18px -10px rgb(30 15 10 / 0.5);
+}
+/* Photo texture, semi-transparent and multiplied so the palette colour stays in charge. */
+.wood::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: var(--tex, none);
+  background-size: max(700px, 100%) auto;
+  background-position: var(--gx) var(--gy);
+  mix-blend-mode: multiply;
+  opacity: var(--tex-o);
+}
+.wood::after { inset: -20%; animation: var(--motion) var(--tdur) ease-in-out var(--tdelay) infinite alternate; }
+.across::after { rotate: 90deg; scale: 1.6; }
+/* Soft light passing over the grain, each block on its own clock. */
+.wood::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 236 210 / 0.10) 50%, transparent 65%);
+  background-size: 300% 100%;
+  animation: sheen var(--sdur) linear var(--tdelay) infinite;
+}
+/* Three texture motions, picked per block. */
+@keyframes pan-x { from { transform: translate3d(-6%, 0, 0); } to { transform: translate3d(6%, 0, 0); } }
+@keyframes pan-y { from { transform: translate3d(0, -6%, 0); } to { transform: translate3d(0, 6%, 0); } }
+@keyframes breathe { from { transform: scale(1) translate3d(-2%, 1%, 0); } to { transform: scale(1.12) translate3d(2%, -1%, 0); } }
+@keyframes sheen { from { background-position: 100% 0; } to { background-position: -200% 0; } }
+.half + .half { border-left: 1px solid rgb(0 0 0 / 0.28); }
+
+/* Reveal: planks slide out vertically alternating; squares tilt and drop the other way. */
+.open .slot { transform: translateY(calc(var(--dir) * 135cqh)); }
+.open .square { transform: translateY(calc(var(--dir) * -135cqh)) rotate(calc(var(--dir) * 9deg)); }
+
+/* Scroll-driven mode (amount prop): each block leaves at its own point of the 0→1 range. */
+.scrub .slot { transition: none; transform: translateY(calc(var(--dir) * 135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }
+.scrub .square { transform: translateY(calc(var(--dir) * -135cqh * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))) rotate(calc(var(--dir) * 9deg * clamp(0, var(--amt) * 1.8 - var(--s) * 0.8, 1))); }
