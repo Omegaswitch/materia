@@ -1,3 +1,4 @@
+import Grow from './Grow';
 import HeroLogo from './HeroLogo';
 import { hero } from '../content';
 import s from './Hero.module.css';
@@ -8,7 +9,7 @@ export default function Hero() {
       <HeroLogo />
       <div className={s.foot}>
         <img src={hero.badge.src} alt={hero.badge.alt} width={hero.badge.w} height={hero.badge.h} className={s.badge} />
-        <p className={s.sentence}>{hero.sentence}</p>
+        <Grow as="p" className={s.sentence} delay={400}>{hero.sentence}</Grow>
         <a className="btn" href={hero.action.href}>{hero.action.label}</a>
       </div>
     </header>

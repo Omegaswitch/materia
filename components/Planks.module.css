@@ -1,4 +1,4 @@
-.band { margin-top: var(--gap); height: 72svh; display: flex; gap: 6px; overflow: hidden; }
+.band { margin-top: var(--gap); height: 90svh; display: flex; gap: 6px; overflow: hidden; }
 .col { display: flex; flex-direction: column; gap: 6px; flex-basis: 0; margin-block: -12svh; }
 .plank { min-height: 0; }
 @supports (animation-timeline: view()) {

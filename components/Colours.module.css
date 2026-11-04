@@ -1,4 +1,4 @@
-.section { margin-top: var(--gap); }
+.section { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
 .figure { position: relative; width: min(100%, 1100px); margin: clamp(80px, 12vw, 180px) auto 0; }
 .figure img { width: 100%; }
 .callouts { list-style: none; margin: 0; padding: 0; }
