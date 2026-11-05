@@ -20,8 +20,9 @@
 .last { margin-top: clamp(24px, 4svh, 56px); font-size: var(--step-small); }
 @media (max-width: 799px) {
   .mark { height: 20svh; min-height: 120px; }
-  /* the same three columns as desktop, tighter */
-  .info { gap: 16px; grid-template-columns: 1.2fr 1fr 1fr; font-size: 0.8125rem; }
-  .makers { flex-direction: column; gap: 10px; }
-  .h { font-size: var(--step-small); }
+  .info { gap: 28px 20px; grid-template-columns: 1fr 1fr; font-size: 0.9375rem; }
+  .makers { grid-column: 1 / -1; }
+  .info ul { gap: 2px; }
+  .info a { display: inline-block; padding-block: 8px; }  /* 40px+ tap rows */
+  .last { font-size: 0.875rem; }
 }

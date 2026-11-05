@@ -4,4 +4,8 @@
 .pron, .def { max-width: 38ch; }
 .pron { margin: 0.9em 0 0.2em; line-height: 1.3; }
 .pron span { margin-left: 0.5em; }
+@media (max-width: 700px) {
+  .word { font-size: 15.5vw; }
+  .entry { font-size: 1.1875rem; }
+}
 .def { overflow-wrap: break-word; color: var(--rust-ink); line-height: 1.35; }

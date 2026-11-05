@@ -3,8 +3,15 @@
 .rest { width: min(100%, 820px, 100svh); margin: clamp(24px, 4svh, 56px) auto 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); align-items: end; }
 .kit { margin: 0; }
 .name { margin-top: 12px; text-align: center; font-size: var(--step-lead); }
-/* Phone: the same three-across row as desktop, just tighter */
+/* Phone: the base kit full width, the add-on kits in a row you swipe, the next one peeking in */
 @media (max-width: 699px) {
-  .rest { gap: 14px; }
-  .name { font-size: var(--step-body); margin-top: 8px; }
+  .rest {
+    display: flex; align-items: end; gap: 20px; width: auto;
+    margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 8px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .rest::-webkit-scrollbar { display: none; }
+  .rest > * { flex: 0 0 74vw; scroll-snap-align: start; }
+  .name { font-size: 1.1875rem; margin-top: 10px; }
 }

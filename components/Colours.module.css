@@ -28,7 +28,7 @@
 
 /* Phone: the same callouts, folded: labels in a row above and below the board, elbow lines to each key. */
 @media (max-width: 899px) {
-  .figure { --band: 34px; margin: calc(var(--band) + 3.4em) auto calc(var(--band) + 3.4em); }
+  .figure { --band: 34px; width: calc(100% + 2 * var(--gutter)); max-width: none; margin: calc(var(--band) + 3.4em) calc(-1 * var(--gutter)) calc(var(--band) + 3.4em); }
   .callouts { position: absolute; inset: 0; pointer-events: none; }
   .callout { position: absolute; inset: 0; }
   .line { display: none; }

@@ -20,10 +20,16 @@
   --font: var(--f-text), Georgia, serif;
 }
 
-html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
-/* Every part of the site is a full page; scrolling always comes to rest on a whole part.
-   A part taller than the screen can still be scrolled through before the next one. */
-.page { min-height: 100svh; scroll-snap-align: start; scroll-snap-stop: always; }
+html { scroll-behavior: smooth; }
+/* Every part of the site is a full page. Scrolling is never taken over (no snapping: it fights trackpad
+   momentum, traps content taller than the screen and jumps with the iOS address bar). Instead each part
+   fades in as it fills the screen and out as it leaves, so one part is seen at a time and the paper is
+   all that shows in between. */
+.page { min-height: 100svh; }
+@supports (animation-timeline: view()) {
+  .page { animation: page-turn linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes page-turn { 0%, 24% { opacity: 0; } 40%, 60% { opacity: 1; } 76%, 100% { opacity: 0; } }
+}
 html, body { overflow-x: clip; }
 body { background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
