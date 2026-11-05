@@ -20,7 +20,7 @@ export default function Planks({ columns = 7, seed = 5 }) {
   const rnd = rng(seed);
   let n = 0;
   return (
-    <div className={`page ${s.page}`} aria-hidden="true" data-lazy>
+    <div id="wood" className={`page ${s.page}`} aria-hidden="true" data-lazy>
       <div className={s.band}>
         {Array.from({ length: columns }, (_, i) => {
           const grow = (0.6 + rnd()).toFixed(2);
