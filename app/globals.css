@@ -8,7 +8,6 @@
   --clay: #a0624c;           /* GM / K in the lockup */
   --gutter: clamp(16px, 4vw, 56px);
   --gap: clamp(150px, 17vw, 280px);
-  --border: clamp(18px, 2vw, 28px);  /* meander border width */
   --radius: 6px;
   --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
 
@@ -26,7 +25,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
    A part taller than the screen can still be scrolled through before the next one. */
 .page { min-height: 100svh; scroll-snap-align: start; scroll-snap-stop: always; }
 html, body { overflow-x: clip; }
-body { position: relative; padding-inline: calc(var(--border) + 6px); background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
+body { background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
 a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { text-decoration-thickness: 2px; }
@@ -36,13 +35,6 @@ img { display: block; max-width: 100%; height: auto; }
 
 .wrap { padding-inline: var(--gutter); }
 
-/* The meander from the deck, down both edges of the page. */
-body::before, body::after {
-  content: ''; position: absolute; z-index: 3; top: 0; bottom: 0; width: var(--border); pointer-events: none;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 148 167'%3E%3Cg transform='translate%28148 0%29 rotate%2890%29'%3E%3Cpath d='M0 143H167 M5 143V12Q5 5 12 5H126Q133 5 133 12V101Q133 108 126 108H35Q28 108 28 101V45Q28 38 35 38H101Q108 38 108 45V65Q108 72 101 72H50' fill='none' stroke='%232b1b15' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100% auto repeat-y;
-}
-body::before { left: 0; }
-body::after { right: 0; transform: scaleX(-1); }
 
 /* Text grows out of the page (components/Grow.jsx). Without JS or with reduced motion it is plain text. */
 .seep-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
