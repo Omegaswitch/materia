@@ -34,8 +34,8 @@ export default function HeroLogo() {
         rimColor="#a0624c"
         palette="duotone"
         levels={2}
-        contrast={1.15}
-        brightness={0.06}
+        contrast={fine ? 1.3 : 1.15}
+        brightness={fine ? 0.28 : 0.06}
         rim={0}
         reverse={false}
         wander={false}

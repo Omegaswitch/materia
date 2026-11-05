@@ -1,13 +1,9 @@
 .page { display: grid; align-items: center; padding-block: 6svh; }
 .band { height: 88svh; display: flex; gap: 6px; overflow: hidden; }
-.col { display: flex; flex-direction: column; gap: 6px; flex-basis: 0; margin-block: -12svh; }
-.plank { min-height: 0; }
+.col { position: relative; flex-basis: 0; overflow: hidden; }
+/* Two copies of the column stacked (200%); moving up by one copy (-50%) loops it seamlessly. */
+.track { position: absolute; inset: 0 0 auto; height: 200%; animation: glide var(--t) linear infinite; will-change: transform; }
+@keyframes glide { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, -50%, 0); } }
+.slot { padding-bottom: 6px; } /* the gap between planks, inside each slot so the loop stays exact */
+.plank { height: 100%; }
 @media (max-width: 699px) { .col:nth-child(n + 5) { display: none; } }
-@supports (animation-timeline: view()) {
-  .col { animation: drift linear both; animation-timeline: view(); }
-  @keyframes drift {
-    from { transform: translate3d(0, calc(var(--k) * 10svh), 0); }
-    to { transform: translate3d(0, calc(var(--k) * -10svh), 0); }
-  }
-}
-
