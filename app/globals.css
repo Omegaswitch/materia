@@ -30,6 +30,25 @@ html { scroll-behavior: smooth; }
   .page { animation: page-turn linear both; animation-timeline: view(); animation-range: cover; }
   @keyframes page-turn { 0%, 24% { opacity: 0; } 40%, 60% { opacity: 1; } 76%, 100% { opacity: 0; } }
 }
+/* Paged (components/Pager.jsx): every .page is a stage that fills the screen; only the current one is shown. */
+html.paged, html.paged body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.paged .page {
+  position: fixed; inset: 0; min-height: 0; height: 100%;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: none; /* only if a page ever outgrows its screen */
+  animation: none; background: var(--paper);
+}
+.paged .page::-webkit-scrollbar { display: none; }
+.paged .page:not(.on):not(.leaving) { display: none !important; }
+.paged .page.on { z-index: 2; }
+.paged .page.leaving { z-index: 1; pointer-events: none; }
+/* Where you are: a dot per page on the right edge, each a button to that page. */
+.pager { position: fixed; z-index: 10; right: clamp(4px, 1.4vw, 22px); top: 50%; translate: 0 -50%; display: grid; }
+.pager button { width: 28px; height: 28px; display: grid; place-items: center; padding: 0; border: 0; background: none; cursor: pointer; }
+.pager button::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); opacity: 0.22; transition: opacity 0.3s, transform 0.4s var(--ease); }
+.pager button:hover::before { opacity: 0.55; }
+.pager button[aria-current]::before { opacity: 0.85; transform: scale(1.45); }
+@media (max-width: 700px) { .pager button { width: 22px; height: 26px; } .pager button::before { width: 6px; height: 6px; } }
+
 html, body { overflow-x: clip; }
 body { background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }

@@ -6,6 +6,7 @@ import Kits from '../components/Kits';
 import Gallery from '../components/Gallery';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Pager from '../components/Pager';
 
 export default function Page() {
   return (
@@ -20,6 +21,7 @@ export default function Page() {
       </main>
       <Footer />
       <Reveal />
+      <Pager />
     </>
   );
 }
