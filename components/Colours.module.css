@@ -24,12 +24,25 @@
   .figure { --ext: clamp(28px, 3vw, 48px); margin-bottom: clamp(80px, 9vw, 140px); width: min(100% - 2 * clamp(150px, 15vw, 230px), 1100px); }
 }
 
-/* Phone: the board, then the five colours as a list with a swatch each. */
+.elbow { display: none; }
+
+/* Phone: the same callouts, folded: labels in a row above and below the board, elbow lines to each key. */
 @media (max-width: 899px) {
-  .figure { margin-top: 28px; }
-  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 20px; margin-top: 24px; }
-  .label { text-align: left; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; align-items: center; }
-  .num { grid-column: 2; }
-  .label { white-space: normal; }
-  .swatch { display: block; grid-row: span 2; width: 28px; height: 28px; border-radius: 4px; background: var(--c); border-bottom: 4px solid color-mix(in oklab, var(--c) 60%, #000); }
+  .figure { --band: 34px; margin: calc(var(--band) + 3.4em) auto calc(var(--band) + 3.4em); }
+  .callouts { position: absolute; inset: 0; pointer-events: none; }
+  .callout { position: absolute; inset: 0; }
+  .line { display: none; }
+  .label { position: absolute; left: var(--slot); translate: -50% 0; font-size: var(--step-small); }
+  .mTop .label { bottom: calc(100% + var(--band) + 6px); }
+  .mBottom .label { top: calc(100% + var(--band) + 6px); }
+  .elbow { display: block; position: absolute; background: var(--ink); }
+  /* 1: from the key to the middle of the band; 2: along the band to the label's slot; 3: up or down to the label */
+  .mTop .e1 { left: var(--x); width: 1px; top: calc(var(--band) / -2); height: calc(var(--y) + var(--band) / 2); }
+  .mTop .e2 { left: var(--from-x); width: var(--run); height: 1px; top: calc(var(--band) / -2); }
+  .mTop .e3 { left: var(--slot); width: 1px; top: calc(var(--band) * -1); height: calc(var(--band) / 2); }
+  .mBottom .e1 { left: var(--x); width: 1px; top: var(--y); height: calc(100% - var(--y) + var(--band) / 2); }
+  .mBottom .e2 { left: var(--from-x); width: var(--run); height: 1px; top: calc(100% + var(--band) / 2); }
+  .mBottom .e3 { left: var(--slot); width: 1px; top: calc(100% + var(--band) / 2); height: calc(var(--band) / 2); }
+  .elbow { transition: transform 1.2s var(--ease) 1.2s; }
+  :global(.js) .figure:not(:global(.in)) .elbow { transform: scale(0); }
 }

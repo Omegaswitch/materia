@@ -3,7 +3,8 @@
 .rest { width: min(100%, 820px, 100svh); margin: clamp(24px, 4svh, 56px) auto 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); align-items: end; }
 .kit { margin: 0; }
 .name { margin-top: 12px; text-align: center; font-size: var(--step-lead); }
+/* Phone: the same three-across row as desktop, just tighter */
 @media (max-width: 699px) {
-  .rest { grid-template-columns: 1fr 1fr; }
-  .rest > :first-child { grid-column: 1 / -1; }
+  .rest { gap: 14px; }
+  .name { font-size: var(--step-body); margin-top: 8px; }
 }

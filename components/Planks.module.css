@@ -2,6 +2,7 @@
 .band { height: 88svh; display: flex; gap: 6px; overflow: hidden; }
 .col { display: flex; flex-direction: column; gap: 6px; flex-basis: 0; margin-block: -12svh; }
 .plank { min-height: 0; }
+@media (max-width: 699px) { .col:nth-child(n + 5) { display: none; } }
 @supports (animation-timeline: view()) {
   .col { animation: drift linear both; animation-timeline: view(); }
   @keyframes drift {
