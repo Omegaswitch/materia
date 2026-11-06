@@ -7,6 +7,11 @@
 }
 /* The haze margin baked into the image: 16.5% each side, 30% above and below. */
 .logo .spill { position: absolute; left: -16.5%; top: -30%; width: 133%; height: 160%; max-width: none; }
+/* With JS the clean logo waits: the dither grows in first and clears to it. It shows anyway if the veil
+   has not drawn within 2.5 s (slow chunk), and at once if WebGL is unavailable (.veil-off). */
+:global(.js) .logo:not(:global(.veil-off)) img.spill { animation: logo-late 0s 2.5s both; }
+:global(.js) .logo:global(.veil-on):not(:global(.veil-off)) img.spill { visibility: hidden; animation: none; }
+@keyframes logo-late { from { visibility: hidden; } to { visibility: visible; } }
 .foot { position: relative; z-index: 1; display: grid; justify-items: center; gap: 20px; text-align: center; }
 .badge { width: 40px; height: auto; mix-blend-mode: multiply; }
 .sentence { font-size: var(--step-body); max-width: min(36ch, 100%); margin-bottom: 8px; }
