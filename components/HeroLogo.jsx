@@ -27,9 +27,9 @@ export default function HeroLogo() {
         pixelSize={fine ? 1 : 2}
         inkColor="#3b2219"
         paperColor="#ece4ce"
-        revealRadius={200}
+        revealRadius={170}
         softness={0.6}
-        linger={1}
+        linger={4.5}
         fit="contain"
         rimColor="#a0624c"
         palette="duotone"

@@ -1,7 +1,7 @@
 'use client';
 
-// DitherVeil, as supplied. Changes for this site (marked `materia:`). On load the dither grows in from paper,
-// holds, then clears outward from the centre to the clean logo; once settled the pointer brings the dither back.
+// DitherVeil, as supplied. Changes for this site (marked `materia:`). On load the dither drifts in on a wind and
+// stays. The pointer sweeps it away to the clean logo, and the wind slowly blows the sand back over it.
 // Earlier note: the canvas crossfades in over a plain
 // fallback image once the picture has loaded, instead of opening as a solid ink rectangle.
 
@@ -230,6 +230,7 @@ uniform float uSoftness;
 uniform float uStrength;
 uniform float uFade;
 uniform float uHold;
+uniform float uWind;
 
 in vec2 vUv;
 out vec4 fragColor;
@@ -242,7 +243,8 @@ float strokeDistance(vec2 p, vec2 a, vec2 b) {
 
 void main() {
   vec2 p = vec2(vUv.x, 1.0 - vUv.y) * uSize;
-  float trail = max(texture(tPrev, vUv).r - uFade, 0.0);
+  // materia: the swept patch drifts with the wind as it fades, so the sand blows back in from the left
+  float trail = max(texture(tPrev, vUv - vec2(uWind, 0.0)).r - uFade, 0.0);
   float band = max(uRadius * uSoftness, 1.0) * uHold;
   float d = strokeDistance(p, uFrom, uTo);
   trail = max(trail, clamp((uRadius - d) / band, 0.0, 1.0) * uStrength);
@@ -504,7 +506,8 @@ const DitherVeil = ({
       uSoftness: { value: 0.5 },
       uStrength: { value: 0 },
       uFade: { value: 1 },
-      uHold: { value: HOLD }
+      uHold: { value: HOLD },
+      uWind: { value: 0 }
     };
     const viewUniforms = {
       tImage: { value: imageTexture },
@@ -692,6 +695,7 @@ const DitherVeil = ({
       maskUniforms.uSoftness.value = s.softness;
       maskUniforms.uStrength.value = presence;
       maskUniforms.uFade.value = Math.max(fade, minFade);
+      maskUniforms.uWind.value = (55 * dt) / Math.max(1, width); // materia: ~55 px/s of drift
       viewUniforms.uBurstWidth.value = Math.max(60, s.revealRadius * 0.9);
       renderer.render({ scene: maskMesh, target: masks[1] });
       masks.reverse();
@@ -745,13 +749,13 @@ const DitherVeil = ({
       viewUniforms.uIntro.value = 1 - Math.pow(1 - intro, 2);
       // materia: after the intro and a short hold, the dither clears outward to the clean logo
       const settle = image ? Math.min(1, Math.max(0, (now - introStart - INTRO_MS - HOLD_MS) / SETTLE_MS)) : 0;
-      viewUniforms.uSettle.value = settle < 0.5 ? 2 * settle * settle : 1 - Math.pow(-2 * settle + 2, 2) / 2;
+      viewUniforms.uSettle.value = 0; // materia: no automatic clearing; the pointer sweeps, the wind refills
       renderer.render({ scene: viewMesh });
       if (image && canvas.style.opacity !== '1') { canvas.style.opacity = '1'; container.parentElement?.classList.add('veil-on'); } // materia
 
       // materia: render only while something changes; a resting pointer no longer redraws every frame
       const settling = Math.abs((pointer.inside || wanderOn ? 1 : 0) - presence) > 0.002;
-      const busy = wanderOn || settling || bursts.length > 0 || now < trailUntil || (image && settle < 1);
+      const busy = wanderOn || settling || bursts.length > 0 || now < trailUntil || (image && intro < 1);
       if (busy && visible) raf = requestAnimationFrame(frame);
     };
 
