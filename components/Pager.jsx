@@ -10,12 +10,15 @@ import { useEffect, useRef, useState } from 'react';
 // - A page taller than the screen scrolls inside itself first, then turns.
 // Without JS the site keeps its normal scrolling (html never gets .paged). Reduced motion: pages switch at once.
 const NAMES = { top: 'Start', story: 'Materia', colours: 'The colours', wood: 'Wood', kits: 'Kits', renders: 'Renders', vendors: 'Vendors' };
+const DARK = new Set(['wood']); // pages under which the indicator turns paper-coloured
 const QUIET = 170;
 const TURN = 1150; // the length of one page turn, in ms
 
 export default function Pager() {
   const [names, setNames] = useState([]);
+  const [ids, setIds] = useState([]);
   const [at, setAt] = useState(0);
+  const [dist, setDist] = useState(1); // how many pages the last move covered: longer moves flow a little longer
   const go = useRef(() => {});
 
   useEffect(() => {
@@ -32,6 +35,7 @@ export default function Pager() {
     root.classList.add('paged');
     pages.forEach((p, i) => p.classList.toggle('on', i === cur));
     setNames(pages.map((p, i) => NAMES[p.id] ?? `Page ${i + 1}`));
+    setIds(pages.map((p) => p.id));
     setAt(cur);
 
     let busy = false;
@@ -41,6 +45,7 @@ export default function Pager() {
       const from = pages[cur];
       const to = pages[i];
       const d = i > cur ? 1 : -1;
+      setDist(Math.abs(i - cur));
       cur = i;
       setAt(i);
       to.scrollTop = d > 0 ? 0 : to.scrollHeight;
@@ -142,8 +147,27 @@ export default function Pager() {
   }, []);
 
   if (!names.length) return null;
+  // The indicator is liquid: a "goo" filter (blur, then a hard alpha threshold) melts shapes that come close.
+  // The current page is a drop of two blobs, a head that leaves first and a tail that follows, so on the way it
+  // stretches, pulls away from the dot it leaves and merges into the one it lands on.
   return (
-    <nav className="pager" aria-label="Pages">
+    <nav className={`pager${DARK.has(ids[at]) ? ' pager--light' : ''}`} aria-label="Pages" style={{ '--at': at, '--dist': dist }}>
+      <svg className="pager-defs" aria-hidden="true" focusable="false">
+        <filter id="pager-goo" x="-100%" y="-10%" width="300%" height="120%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2.6" result="soft" />
+          <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
+        </filter>
+      </svg>
+      <div className="pager-dots" aria-hidden="true">
+        {names.map((name, i) => <span key={name} className="pager-dot" style={{ '--i': i }} />)}
+      </div>
+      <div className="pager-goo" aria-hidden="true">
+        {/* anchors: too small to show on their own, they bridge to the drop as it leaves and arrives */}
+        {names.map((name, i) => <span key={name} className="pager-anchor" style={{ '--i': i }} />)}
+        <span className="pager-drop pager-head" />
+        <span className="pager-drop pager-body" />
+        <span className="pager-drop pager-tail" />
+      </div>
       {names.map((name, i) => (
         <button key={name} type="button" aria-label={name} aria-current={i === at ? 'page' : undefined} onClick={() => go.current(i)} />
       ))}
