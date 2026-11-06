@@ -15,9 +15,7 @@ export default function Colours() {
     <section id="colours" className={`wrap page ${s.section}`} aria-labelledby="colours-title">
       <Grow as="h2" id="colours-title" className="head" p={0.6}>{colours.heading}</Grow>
       <figure className={`para ${s.figure}`} style={{ '--p': 0.4 }} data-reveal>
-        <Grow p={0} duration={3000}>
-          <img src={r.src} srcSet={`${r.small} 900w, ${r.src} 1520w`} sizes="(max-width: 899px) 100vw, 70vw" width={r.w} height={r.h} alt={r.alt} loading="lazy" decoding="async" />
-        </Grow>
+        <img src={r.src} srcSet={`${r.small} 900w, ${r.src} 1520w`} sizes="(max-width: 899px) 100vw, 70vw" width={r.w} height={r.h} alt={r.alt} loading="lazy" decoding="async" />
         <ul className={s.callouts} role="list">
           {colours.items.map((c) => {
             const [num, ...rest] = c.name.replace('PANTONE ', '').split(' ');

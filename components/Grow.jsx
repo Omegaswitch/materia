@@ -1,21 +1,18 @@
 'use client';
 import { useEffect, useId, useRef } from 'react';
 
-// Text that grows out of the page like a spore colony on bark, then stays a little alive.
+// Text that grows out of the page like a spore colony on bark, then stays alive at its own edges.
 //
-// Growth: each block gets its own growth map, drawn once in a small canvas: a few colonies spread outward from
-// where their spores landed (distance from each spore, roughened with noise), and a scatter of tiny specks lands
-// first. The map is thresholded while the threshold sweeps, so specks appear, colonies swell and merge, and the
-// letters fill in. The map itself is displaced by noise, so the growing fronts wobble.
-// Shake: the noise is re-rolled every ~80 ms (a "line boil", as in hand-drawn animation): the letters tremble while
-// they grow and keep a faint tremble once grown.
-// Live: once grown, a few tiny flecks blink out and back every second or two.
-// Cost: the live loop runs at ~9 fps, only while the block is on screen and the tab is visible. WebKit (Safari,
-// every iOS browser) runs SVG filters on the CPU, so it gets a soft fade instead; reduced motion gets plain text.
+// Entrance (once): each block gets a growth map drawn in a small canvas: a few colonies spread outward from where
+// their spores landed, a scatter of specks lands first. The map is thresholded while the threshold sweeps.
+// Alive: the letters are displaced by a slow noise field. Inside a solid letter a displacement changes nothing, so
+// only the outlines move: the letters seem to shift inside their own shell. The noise field is slid in a small loop
+// (feOffset) rather than re-rolled, so the motion is continuous, not jumpy. It runs at 30 fps, only for text on
+// screen while the tab is visible. Edge size and speed scale with the type.
+// WebKit (Safari, every iOS browser) gets a soft fade and still text; reduced motion, plain text.
 // Every block also drifts at its own parallax rate (p, 0 = none).
-const SHARP = 16; // crispness of the growing edge: colonies have crisp, ragged borders
-const BOIL = 80; // ms between re-rolls of the tremble while growing
-const LIVE = 110; // ms between re-rolls once grown
+const SHARP = 16; // crispness of the growing edge
+const FPS = 30;
 
 // Small seeded PRNG
 const prng = (seed) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
@@ -68,125 +65,101 @@ function sporeMap(w, h, rnd) {
   return canvas.toDataURL('image/png');
 }
 
-// vanishBefore: a selector; as this block scrolls up toward that element it dissolves back into the page, gone before it touches.
-export default function Grow({ as: Tag = 'div', children, className = '', style, duration = 2600, delay = 0, p, vanishBefore, ...rest }) {
+export default function Grow({ as: Tag = 'div', children, className = '', style, duration = 2600, delay = 0, p, ...rest }) {
   const ref = useRef(null);
   const image = useRef(null);
-  const boil = useRef(null);
   const matrix = useRef(null);
+  const noise = useRef(null);
+  const slide = useRef(null);
   const warp = useRef(null);
-  const fleckNoise = useRef(null);
-  const fleck = useRef(null);
   const id = 'g' + useId().replace(/[^a-z0-9]/gi, '');
   // 0–1 from the id: stable on server and client
   const h = ([...id].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) % 9973, 7) % 1000) / 1000;
   const drift = p ?? +(0.3 + h * 0.6).toFixed(2);
   const time = duration * (0.85 + h * 0.3);
-  const grain = (0.022 + h * 0.014).toFixed(3);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
     window.__live = true;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.classList.add('grown'); return undefined; }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.classList.add('grown', 'still'); return undefined; }
     const fade = 'GestureEvent' in window;
     if (fade) el.classList.add('fade');
     const rnd = prng(1 + Math.floor(h * 2147483000));
+    const set = (q) => matrix.current?.setAttribute('values', `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP + q * (SHARP + 1)}`);
 
-    const set = (q) => { // q: 0 nothing, 1 fully grown
-      matrix.current?.setAttribute('values', `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP + q * (SHARP + 1)}`);
+    // the edge's character follows the type: broad slow swells on the big words, a fine shiver on body text
+    const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+    const freq = Math.min(0.07, Math.max(0.009, 1.1 / fs));
+    const amp = Math.min(3.4, Math.max(0.7, fs * 0.03));
+    const loop = 0.45 / freq; // the noise slides about half a cell around a small loop
+    let w = 0, hgt = 0;
+    const size = () => {
+      w = el.offsetWidth; hgt = el.offsetHeight;
+      image.current?.setAttribute('width', w); image.current?.setAttribute('height', hgt);
+      // noise drawn larger than the block, so sliding it never shows an edge
+      const m = Math.ceil(loop + amp * 2);
+      noise.current?.setAttribute('x', -m); noise.current?.setAttribute('y', -m);
+      noise.current?.setAttribute('width', w + 2 * m); noise.current?.setAttribute('height', hgt + 2 * m);
     };
-    const reroll = (scale) => { // the line boil: new noise, same character
-      boil.current?.setAttribute('seed', String(Math.floor(rnd() * 9999)));
-      warp.current?.setAttribute('scale', scale.toFixed(2));
-    };
-    const flecks = (on) => { // a few tiny specks blink out: only the brightest 1–2% of a fine noise
-      fleckNoise.current?.setAttribute('seed', String(Math.floor(rnd() * 9999)));
-      fleck.current?.setAttribute('values', `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  26 0 0 0 ${on ? -26 * 0.715 : -40}`);
-    };
-    const size = () => { image.current?.setAttribute('width', el.offsetWidth); image.current?.setAttribute('height', el.offsetHeight); };
+    noise.current?.setAttribute('baseFrequency', freq.toFixed(4));
+    warp.current?.setAttribute('scale', amp.toFixed(2));
 
-    let raf = 0, live = 0, visible = false, grown = false, built = false, lastBoil = 0, ticks = 0, start = 0;
+    let raf = 0, start = 0, grown = false, visible = false, live = 0, lastLive = 0;
+    const phase = h * Math.PI * 2, speed = 0.35 + h * 0.25; // radians per second: slow, different per block
+    const breathe = (now) => {
+      live = 0;
+      if (now - lastLive >= 1000 / FPS - 2) {
+        lastLive = now;
+        const a = phase + (now / 1000) * speed;
+        slide.current?.setAttribute('dx', (Math.cos(a) * loop).toFixed(2));
+        slide.current?.setAttribute('dy', (Math.sin(a * 0.8) * loop * 0.7).toFixed(2));
+      }
+      if (visible && document.visibilityState === 'visible') live = requestAnimationFrame(breathe);
+    };
+    const wake = () => { if (grown && !fade && visible && !live && document.visibilityState === 'visible') live = requestAnimationFrame(breathe); };
     const tick = (now) => {
       if (!start) start = now + delay;
       const t = Math.min(1, Math.max(0, (now - start) / time));
-      set(t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2); // slow start, spreading, slow finish
-      if (now - lastBoil > BOIL) { lastBoil = now; reroll(0.7 + (1 - t) * 2.4); }
+      set(t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+      breathe(now); // the edges are alive while it grows too
       if (t < 1) { raf = requestAnimationFrame(tick); return; }
       grown = true;
       el.classList.add('grown');
-      toggleLive();
+      wake();
     };
-    const liveTick = () => {
-      ticks++;
-      reroll(0.55 + rnd() * 0.5);
-      if (ticks % (10 + Math.floor(rnd() * 12)) === 0) flecks(rnd() < 0.8);
-    };
-    const toggleLive = () => {
-      const run = grown && visible && document.visibilityState === 'visible' && !fade;
-      if (run && !live) live = setInterval(liveTick, LIVE);
-      if (!run && live) { clearInterval(live); live = 0; }
-    };
-
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
-      if (visible && !built) {
-        built = true;
+      if (visible && !start && !el.classList.contains('grown')) {
         if (fade) { setTimeout(() => el.classList.add('grown'), delay); return; }
         size();
-        image.current?.setAttribute('href', sporeMap(el.offsetWidth, el.offsetHeight, rnd));
-        raf = requestAnimationFrame(tick);
+        image.current?.setAttribute('href', sporeMap(w, hgt, rnd));
+        start = -1; // claimed; tick sets the real start
+        raf = requestAnimationFrame((n) => { start = 0; tick(n); });
+        return;
       }
-      toggleLive();
+      wake();
     });
     io.observe(el);
-    const ro = new ResizeObserver(() => { if (built) size(); });
+    const ro = new ResizeObserver(() => { if (start) size(); });
     ro.observe(el);
-    document.addEventListener('visibilitychange', toggleLive);
-
-    // Dissolve as it nears vanishBefore: by the gap left, as a share of the gap at rest (layout positions, no transforms)
-    const target = vanishBefore && document.querySelector(vanishBefore);
-    let frame = 0;
-    const top = (n) => { let y = 0; for (; n; n = n.offsetParent) y += n.offsetTop; return y; };
-    const check = () => {
-      frame = 0;
-      if (!target || !grown) return;
-      const rest = Math.max(40, (top(el) - top(target) - target.offsetHeight) * 0.9);
-      const now = el.getBoundingClientRect().top;
-      const gap = now - target.getBoundingClientRect().bottom;
-      // and fully gone by the time it reaches the top 30% of the screen, even once the logo stops drifting
-      const line = innerHeight * 0.3;
-      const travel = Math.max(1, top(el) - line);
-      const q = Math.min(1, Math.max(0, Math.min(gap / rest, ((now - line) / travel) * 1.6)));
-      if (fade) { el.style.opacity = q >= 1 ? '' : String(q); return; }
-      set(q);
-    };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check); };
-    if (target) addEventListener('scroll', onScroll, { passive: true });
-
-    return () => {
-      io.disconnect(); ro.disconnect(); cancelAnimationFrame(raf); cancelAnimationFrame(frame); clearInterval(live);
-      removeEventListener('scroll', onScroll); document.removeEventListener('visibilitychange', toggleLive);
-    };
-  }, [delay, time, vanishBefore, h]);
+    document.addEventListener('visibilitychange', wake);
+    return () => { io.disconnect(); ro.disconnect(); cancelAnimationFrame(raf); cancelAnimationFrame(live); document.removeEventListener('visibilitychange', wake); };
+  }, [delay, time, h]);
 
   return (
     // class 'seep', not 'grow': Tailwind would read 'grow' as flex-grow: 1
     <Tag ref={ref} className={`seep${drift ? ' para' : ''} ${className}`} style={{ ...style, '--grow': `url(#${id})`, ...(drift ? { '--p': drift } : null) }} {...rest}>
       <svg className="seep-defs" aria-hidden="true" focusable="false">
-        <filter id={id} x="-4%" y="-15%" width="108%" height="130%" colorInterpolationFilters="sRGB">
-          {/* where life arrives first (see sporeMap), its fronts wobbled by the boiling noise */}
+        <filter id={id} x="-6%" y="-20%" width="112%" height="140%" colorInterpolationFilters="sRGB">
+          {/* entrance: where life arrives first (see sporeMap) */}
           <feImage ref={image} x="0" y="0" width="0" height="0" preserveAspectRatio="none" result="map" />
-          <feTurbulence ref={boil} type="fractalNoise" baseFrequency={grain} numOctaves="2" seed={Math.round(h * 997)} result="noise" />
-          <feDisplacementMap in="map" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" result="ragged" />
-          <feColorMatrix ref={matrix} in="ragged" type="matrix" values={`0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP}`} result="mask" />
-          {/* the tremble */}
-          <feDisplacementMap ref={warp} in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" result="shaken" />
-          <feComposite in="shaken" in2="mask" operator="in" result="grown" />
-          {/* tiny flecks that blink out and back once grown */}
-          <feTurbulence ref={fleckNoise} type="fractalNoise" baseFrequency="0.17" numOctaves="1" seed="3" result="fine" />
-          <feColorMatrix ref={fleck} in="fine" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  26 0 0 0 -40" result="specks" />
-          <feComposite in="grown" in2="specks" operator="out" />
+          <feColorMatrix ref={matrix} in="map" type="matrix" values={`0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP}`} result="mask" />
+          {/* alive: a slow noise field, slid around a small loop, displaces the letters; only their outlines show it */}
+          <feTurbulence ref={noise} type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed={Math.round(h * 997)} result="field" />
+          <feOffset ref={slide} in="field" dx="0" dy="0" result="slid" />
+          <feDisplacementMap ref={warp} in="SourceGraphic" in2="slid" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="alive" />
+          <feComposite in="alive" in2="mask" operator="in" />
         </filter>
       </svg>
       {children}
