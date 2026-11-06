@@ -34,7 +34,7 @@ export const colours = {
     { id: 'p7592', name: 'PANTONE 7592 C', hex: '#8b453a', x: 19.5, y: 68, side: 'left' },
     { id: 'p7593', name: 'PANTONE 7593 C', hex: '#673933', x: 4.5, y: 21, side: 'left' },
     { id: 'p7594', name: 'PANTONE 7594 C', hex: '#4f3028', x: 85.5, y: 36, side: 'right' },
-    { id: 'p7595', name: 'PANTONE 7595 C', hex: '#47322b', x: 69.7, y: 21, side: 'top' },
+    { id: 'p7595', name: 'PANTONE 7595 C', hex: '#47322b', x: 69.7, y: 21, side: 'turn' }, // rises above the board, then turns right
   ],
 };
 
