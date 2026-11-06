@@ -6,13 +6,14 @@ import { useEffect, useId, useRef } from 'react';
 // Entrance (once): each block gets a growth map drawn in a small canvas: a few colonies spread outward from where
 // their spores landed, a scatter of specks lands first. The map is thresholded while the threshold sweeps.
 // Alive: the letters are displaced by a slow noise field. Inside a solid letter a displacement changes nothing, so
-// only the outlines move: the letters seem to shift inside their own shell. The noise field is slid in a small loop
+// only the outlines move: the letters seem to shift inside their own shell. Two smooth one-octave noise fields
+// drift gently in opposite directions and slowly cross-fade into each other, so the outlines morph in place (no
+// field visibly travels across the letters), updated every frame. Was: one field slid in a loop
 // (feOffset) rather than re-rolled, so the motion is continuous, not jumpy. It runs at 30 fps, only for text on
 // screen while the tab is visible. Edge size and speed scale with the type.
 // WebKit (Safari, every iOS browser) gets a soft fade and still text; reduced motion, plain text.
 // Every block also drifts at its own parallax rate (p, 0 = none).
 const SHARP = 16; // crispness of the growing edge
-const FPS = 30;
 
 // Small seeded PRNG
 const prng = (seed) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
@@ -71,6 +72,9 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
   const matrix = useRef(null);
   const noise = useRef(null);
   const slide = useRef(null);
+  const noise2 = useRef(null);
+  const slide2 = useRef(null);
+  const mix = useRef(null);
   const warp = useRef(null);
   const id = 'g' + useId().replace(/[^a-z0-9]/gi, '');
   // 0–1 from the id: stable on server and client
@@ -92,32 +96,39 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
     const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
     const freq = Math.min(0.07, Math.max(0.009, 1.1 / fs));
     const amp = Math.min(3.4, Math.max(0.7, fs * 0.03));
-    const loop = 0.45 / freq; // the noise slides about half a cell around a small loop
+    const loop = 0.22 / freq; // each field drifts about a fifth of a cell: a sway, not a journey
     let w = 0, hgt = 0;
     const size = () => {
       w = el.offsetWidth; hgt = el.offsetHeight;
       image.current?.setAttribute('width', w); image.current?.setAttribute('height', hgt);
       // noise drawn larger than the block, so sliding it never shows an edge
       const m = Math.ceil(loop + amp * 2);
-      noise.current?.setAttribute('x', -m); noise.current?.setAttribute('y', -m);
-      noise.current?.setAttribute('width', w + 2 * m); noise.current?.setAttribute('height', hgt + 2 * m);
+      for (const n of [noise.current, noise2.current]) {
+        n?.setAttribute('x', -m); n?.setAttribute('y', -m);
+        n?.setAttribute('width', w + 2 * m); n?.setAttribute('height', hgt + 2 * m);
+      }
     };
     noise.current?.setAttribute('baseFrequency', freq.toFixed(4));
+    noise2.current?.setAttribute('baseFrequency', (freq * 1.13).toFixed(4));
     warp.current?.setAttribute('scale', amp.toFixed(2));
 
     let raf = 0, start = 0, grown = false, visible = false, live = 0, lastLive = 0;
     const phase = h * Math.PI * 2, speed = 0.35 + h * 0.25; // radians per second: slow, different per block
     const breathe = (now) => {
       live = 0;
-      if (now - lastLive >= 1000 / FPS - 2) {
-        lastLive = now;
-        const a = phase + (now / 1000) * speed;
-        slide.current?.setAttribute('dx', (Math.cos(a) * loop).toFixed(2));
-        slide.current?.setAttribute('dy', (Math.sin(a * 0.8) * loop * 0.7).toFixed(2));
-      }
-      if (visible && document.visibilityState === 'visible') live = requestAnimationFrame(breathe);
+      lastLive = now;
+      const a = phase + (now / 1000) * speed;
+      slide.current?.setAttribute('dx', (Math.cos(a) * loop).toFixed(2));
+      slide.current?.setAttribute('dy', (Math.sin(a * 0.8) * loop * 0.7).toFixed(2));
+      slide2.current?.setAttribute('dx', (-Math.cos(a * 0.9 + 1.3) * loop).toFixed(2));
+      slide2.current?.setAttribute('dy', (-Math.sin(a * 0.7 + 0.4) * loop * 0.7).toFixed(2));
+      const k = 0.5 + 0.5 * Math.sin(a * 0.6); // the slow cross-fade between the two fields
+      mix.current?.setAttribute('k2', k.toFixed(3));
+      mix.current?.setAttribute('k3', (1 - k).toFixed(3));
+      if ((alive || !grown) && visible && document.visibilityState === 'visible') live = requestAnimationFrame(breathe);
     };
-    const wake = () => { if (grown && !fade && visible && !live && document.visibilityState === 'visible') live = requestAnimationFrame(breathe); };
+    const alive = fs >= 24; // only larger type stays alive: on small text the motion is invisible but not free
+    const wake = () => { if (alive && grown && !fade && visible && !live && document.visibilityState === 'visible') live = requestAnimationFrame(breathe); };
     const tick = (now) => {
       if (!start) start = now + delay;
       const t = Math.min(1, Math.max(0, (now - start) / time));
@@ -126,6 +137,7 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
       if (t < 1) { raf = requestAnimationFrame(tick); return; }
       grown = true;
       el.classList.add('grown');
+      if (!alive) el.classList.add('still'); // small text: crisp and still once grown
       wake();
     };
     const io = new IntersectionObserver(([e]) => {
@@ -156,9 +168,13 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
           <feImage ref={image} x="0" y="0" width="0" height="0" preserveAspectRatio="none" result="map" />
           <feColorMatrix ref={matrix} in="map" type="matrix" values={`0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${SHARP} 0 0 0 ${-SHARP}`} result="mask" />
           {/* alive: a slow noise field, slid around a small loop, displaces the letters; only their outlines show it */}
-          <feTurbulence ref={noise} type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed={Math.round(h * 997)} result="field" />
-          <feOffset ref={slide} in="field" dx="0" dy="0" result="slid" />
-          <feDisplacementMap ref={warp} in="SourceGraphic" in2="slid" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="alive" />
+          <feTurbulence ref={noise} type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed={Math.round(h * 997)} result="fieldA" />
+          <feOffset ref={slide} in="fieldA" dx="0" dy="0" result="a" />
+          <feTurbulence ref={noise2} type="fractalNoise" baseFrequency="0.023" numOctaves="1" seed={Math.round(h * 997) + 31} result="fieldB" />
+          <feOffset ref={slide2} in="fieldB" dx="0" dy="0" result="b" />
+          <feComposite ref={mix} in="a" in2="b" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0" result="blend" />
+          <feGaussianBlur in="blend" stdDeviation="1.2" result="smooth" />
+          <feDisplacementMap ref={warp} in="SourceGraphic" in2="smooth" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="alive" />
           <feComposite in="alive" in2="mask" operator="in" />
         </filter>
       </svg>
