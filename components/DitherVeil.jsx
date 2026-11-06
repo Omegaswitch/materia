@@ -35,9 +35,9 @@ const MASK_SCALE = 0.5;
 const MAX_BURSTS = 4;
 const BURST_SECONDS = 1.2;
 const HOLD = 1.6;
-const INTRO_MS = 1100;
-const HOLD_MS = 700; // materia: the dither holds, then clears
-const SETTLE_MS = 1500; // materia: how long the clearing takes
+const INTRO_MS = 2200; // materia: slower, a wind drifting the dither in
+const HOLD_MS = 900; // materia: the dither holds, then clears
+const SETTLE_MS = 2800; // materia: how long the wind takes to sweep it away
 
 const hexToRgb = hex => {
   let h = String(hex || '').replace('#', '');
@@ -364,9 +364,11 @@ void main() {
   vec2 point = vec2(cellUv.x, 1.0 - cellUv.y) * uSize;
   float mask = max(clamp(texture(tMask, cellUv).r * uHold, 0.0, 1.0), shockwave(point));
   float shown = mix(mask, 1.0 - mask, uReverse);
-  // materia: a disk grows from the centre; inside it the clean logo shows and the pointer brings the dither back
-  float far = length(uSize * 0.5);
-  float disk = clamp((uSettle * far * 1.35 - distance(point, uSize * 0.5)) / (far * 0.35), 0.0, 1.0);
+  // materia: a wind sweeps left to right along a wavy, dune-like front; behind it the clean logo shows and the
+  // pointer brings the dither back. Grain is added at the end by the Bayer threshold, so the front is sandy.
+  vec2 q = point / uSize;
+  float dune = q.x + 0.07 * sin(q.y * 9.0 + 1.7) + 0.035 * sin(q.y * 23.0 + 0.4);
+  float disk = clamp((uSettle * 1.55 - 0.25 - dune) / 0.24, 0.0, 1.0);
   shown = mix(shown, 1.0 - shown, disk);
   float order = bayer(cell.yx);
   float low = order * (1.0 - uRim);
@@ -375,7 +377,9 @@ void main() {
 
   vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
   float spread = length((cellUv - 0.5) * aspect) / length(aspect * 0.5);
-  float appear = step(spread * 0.72 + bayer(cell + vec2(3.0, 5.0)) * 0.28, uIntro * 1.001);
+  // materia: the dither drifts in on the same wind, grains running ahead of the front
+  float drift = cellUv.x + 0.06 * sin((1.0 - cellUv.y) * 8.0 + 0.6) + (bayer(cell + vec2(3.0, 5.0)) - 0.5) * 0.34;
+  float appear = step(drift, uIntro * 1.45 - 0.2);
   fragColor = vec4(mix(uPaper, color, appear), 1.0); // materia: grows in from paper, not from ink
 }
 `;
