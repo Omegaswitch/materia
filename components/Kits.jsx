@@ -8,9 +8,7 @@ export default function Kits() {
   const [base, ...rest] = kits.items;
   const Kit = ({ kit }) => (
     <figure className={s.kit}>
-      <Grow p={0} duration={2800}>
-        {kit.src ? <img src={kit.src} alt={kit.alt} loading="lazy" decoding="async" /> : <Board rows={kitRows(kit)} label={`${kit.alt}, drawn`} />}
-      </Grow>
+      {kit.src ? <img src={kit.src} alt={kit.alt} loading="lazy" decoding="async" /> : <Board rows={kitRows(kit)} label={`${kit.alt}, drawn`} />}
       <Grow as="figcaption" className={s.name} delay={300} p={0}>{kit.name}</Grow>
     </figure>
   );

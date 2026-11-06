@@ -14,11 +14,71 @@ const DARK = new Set(['wood']); // pages under which the indicator turns paper-c
 const QUIET = 170;
 const TURN = 1150; // the length of one page turn, in ms
 
+// The liquid drop on the page indicator, moved by springs rather than timed transitions:
+// the head is underdamped (it overshoots a touch and settles), the tail follows on a softer spring so the drop
+// stretches with its speed and thins as it does, a residue pinches off the dot it leaves and shrinks away, and
+// small anchors under every dot bead the drop as it runs past. A goo filter (blur + hard alpha) melts it together.
+function Drops({ count, at }) {
+  const svg = useRef(null);
+  const st = useRef(null);
+  useEffect(() => {
+    const el = svg.current;
+    const pitch = el.getBoundingClientRect().height / count;
+    const yOf = (i) => (i + 0.5) * pitch;
+    const [res, tail, mid, head] = ['res', 'tail', 'mid', 'head'].map((n) => el.querySelector(`.d-${n}`));
+    const s = st.current ?? (st.current = { hy: yOf(at), hv: 0, ty: yOf(at), tv: 0, ry: 0, rr: 0, raf: 0, last: 0 });
+    const target = yOf(at);
+    if (Math.abs(target - s.hy) > 1) { s.ry = s.hy; s.rr = 5.2; } // leave a residue where it was
+    const draw = () => {
+      const stretch = Math.abs(s.hy - s.ty);
+      const rh = Math.max(3.4, 6.3 - stretch * 0.07), rt = Math.max(2.6, 5.2 - stretch * 0.06);
+      head.setAttribute('cy', s.hy); head.setAttribute('r', rh);
+      tail.setAttribute('cy', s.ty); tail.setAttribute('r', rt);
+      mid.setAttribute('cy', (s.hy + s.ty) / 2); mid.setAttribute('r', Math.max(2.4, (rh + rt) / 2 - stretch * 0.035));
+      res.setAttribute('cy', s.ry); res.setAttribute('r', s.rr);
+    };
+    const step = (now) => {
+      const dt = s.last ? Math.min(0.032, (now - s.last) / 1000) : 1 / 60;
+      s.last = now;
+      for (let k = 0; k < 2; k++) { // two half steps: stable at any frame rate
+        const d = dt / 2;
+        s.hv += (220 * (target - s.hy) - 17 * s.hv) * d; s.hy += s.hv * d;
+        s.tv += (90 * (s.hy - s.ty) - 12.5 * s.tv) * d; s.ty += s.tv * d;
+      }
+      s.rr = Math.max(0, s.rr - dt * 13);
+      draw();
+      const done = Math.abs(target - s.hy) < 0.05 && Math.abs(s.hv) < 0.05 && Math.abs(s.hy - s.ty) < 0.05 && Math.abs(s.tv) < 0.05 && s.rr === 0;
+      if (done) { s.hy = s.ty = target; s.hv = s.tv = 0; draw(); s.raf = 0; s.last = 0; } else s.raf = requestAnimationFrame(step);
+    };
+    cancelAnimationFrame(s.raf);
+    s.last = 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { s.hy = s.ty = target; s.rr = 0; draw(); }
+    else s.raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(s.raf);
+  }, [at, count]);
+  const cy = (i) => `${((i + 0.5) / count) * 100}%`;
+  return (
+    <svg ref={svg} className="pager-svg" aria-hidden="true" focusable="false">
+      <filter id="pager-goo" x="-100%" y="-5%" width="300%" height="110%" colorInterpolationFilters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2.8" />
+        <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" />
+      </filter>
+      <g className="pager-dots">{Array.from({ length: count }, (_, i) => <circle key={i} cx="50%" cy={cy(i)} r="3" />)}</g>
+      <g filter="url(#pager-goo)">
+        {Array.from({ length: count }, (_, i) => <circle key={i} cx="50%" cy={cy(i)} r="2.3" />)}
+        <circle className="d-res" cx="50%" cy="0" r="0" />
+        <circle className="d-tail" cx="50%" cy="0" r="0" />
+        <circle className="d-mid" cx="50%" cy="0" r="0" />
+        <circle className="d-head" cx="50%" cy="0" r="0" />
+      </g>
+    </svg>
+  );
+}
+
 export default function Pager() {
   const [names, setNames] = useState([]);
   const [ids, setIds] = useState([]);
   const [at, setAt] = useState(0);
-  const [dist, setDist] = useState(1); // how many pages the last move covered: longer moves flow a little longer
   const go = useRef(() => {});
 
   useEffect(() => {
@@ -45,7 +105,6 @@ export default function Pager() {
       const from = pages[cur];
       const to = pages[i];
       const d = i > cur ? 1 : -1;
-      setDist(Math.abs(i - cur));
       cur = i;
       setAt(i);
       to.scrollTop = d > 0 ? 0 : to.scrollHeight;
@@ -147,27 +206,9 @@ export default function Pager() {
   }, []);
 
   if (!names.length) return null;
-  // The indicator is liquid: a "goo" filter (blur, then a hard alpha threshold) melts shapes that come close.
-  // The current page is a drop of two blobs, a head that leaves first and a tail that follows, so on the way it
-  // stretches, pulls away from the dot it leaves and merges into the one it lands on.
   return (
-    <nav className={`pager${DARK.has(ids[at]) ? ' pager--light' : ''}`} aria-label="Pages" style={{ '--at': at, '--dist': dist }}>
-      <svg className="pager-defs" aria-hidden="true" focusable="false">
-        <filter id="pager-goo" x="-100%" y="-10%" width="300%" height="120%" colorInterpolationFilters="sRGB">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="2.6" result="soft" />
-          <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
-        </filter>
-      </svg>
-      <div className="pager-dots" aria-hidden="true">
-        {names.map((name, i) => <span key={name} className="pager-dot" style={{ '--i': i }} />)}
-      </div>
-      <div className="pager-goo" aria-hidden="true">
-        {/* anchors: too small to show on their own, they bridge to the drop as it leaves and arrives */}
-        {names.map((name, i) => <span key={name} className="pager-anchor" style={{ '--i': i }} />)}
-        <span className="pager-drop pager-head" />
-        <span className="pager-drop pager-body" />
-        <span className="pager-drop pager-tail" />
-      </div>
+    <nav className={`pager${DARK.has(ids[at]) ? ' pager--light' : ''}`} aria-label="Pages">
+      <Drops count={names.length} at={at} />
       {names.map((name, i) => (
         <button key={name} type="button" aria-label={name} aria-current={i === at ? 'page' : undefined} onClick={() => go.current(i)} />
       ))}
