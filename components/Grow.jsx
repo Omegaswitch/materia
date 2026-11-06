@@ -5,7 +5,11 @@ import { useEffect, useId, useRef } from 'react';
 //
 // Entrance (once): each block gets a growth map drawn in a small canvas: a few colonies spread outward from where
 // their spores landed, a scatter of specks lands first. The map is thresholded while the threshold sweeps.
-// Alive: the letters are displaced by a slow noise field. Inside a solid letter a displacement changes nothing, so
+// Alive, as wet ink: the letters are displaced by a slow noise field, then softly blurred and re-cut at a threshold,
+// so their edges creep, thin strokes swell and corners pool like ink still settling into the paper; the threshold
+// rises and falls slowly, so the ink breathes. The amounts are set from the type size (with a visible minimum),
+// and the noise field's contrast is restored first, so every heading moves, not only the biggest.
+// (Earlier note:) the letters are displaced by a slow noise field. Inside a solid letter a displacement changes nothing, so
 // only the outlines move: the letters seem to shift inside their own shell. Two smooth one-octave noise fields
 // drift gently in opposite directions and slowly cross-fade into each other, so the outlines morph in place (no
 // field visibly travels across the letters), updated every frame. Was: one field slid in a loop
@@ -75,6 +79,8 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
   const noise2 = useRef(null);
   const slide2 = useRef(null);
   const mix = useRef(null);
+  const soak = useRef(null);
+  const ink = useRef(null);
   const warp = useRef(null);
   const id = 'g' + useId().replace(/[^a-z0-9]/gi, '');
   // 0–1 from the id: stable on server and client
@@ -95,7 +101,10 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
     // the edge's character follows the type: broad slow swells on the big words, a fine shiver on body text
     const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
     const freq = Math.min(0.07, Math.max(0.009, 1.1 / fs));
-    const amp = Math.min(3.4, Math.max(0.7, fs * 0.03));
+    const amp = Math.min(5, Math.max(1.8, fs * 0.045));     // how far the outline creeps, px
+    const wet = Math.min(1.5, Math.max(0.55, fs * 0.012));  // how much the ink pools: blur before the re-cut
+    soak.current?.setAttribute('stdDeviation', wet.toFixed(2));
+    const INK = 10; // crispness of the re-cut ink edge
     const loop = 0.22 / freq; // each field drifts about a fifth of a cell: a sway, not a journey
     let w = 0, hgt = 0;
     const size = () => {
@@ -125,6 +134,9 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
       const k = 0.5 + 0.5 * Math.sin(a * 0.6); // the slow cross-fade between the two fields
       mix.current?.setAttribute('k2', k.toFixed(3));
       mix.current?.setAttribute('k3', (1 - k).toFixed(3));
+      // the ink breathes: its threshold rises and falls, out of step with the creep
+      const swell = 0.47 + 0.035 * Math.sin(a * 1.7 + 0.8);
+      ink.current?.setAttribute('values', `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${INK} ${(-INK * swell).toFixed(3)}`);
       if ((alive || !grown) && visible && document.visibilityState === 'visible') live = requestAnimationFrame(breathe);
     };
     const alive = fs >= 24; // only larger type stays alive: on small text the motion is invisible but not free
@@ -174,7 +186,15 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
           <feOffset ref={slide2} in="fieldB" dx="0" dy="0" result="b" />
           <feComposite ref={mix} in="a" in2="b" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0" result="blend" />
           <feGaussianBlur in="blend" stdDeviation="1.2" result="smooth" />
-          <feDisplacementMap ref={warp} in="SourceGraphic" in2="smooth" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="alive" />
+          {/* restore the field's contrast (blurring and cross-fading flatten it), so the creep is the size we set */}
+          <feComponentTransfer in="smooth" result="field">
+            <feFuncR type="linear" slope="4" intercept="-1.5" />
+            <feFuncG type="linear" slope="4" intercept="-1.5" />
+          </feComponentTransfer>
+          <feDisplacementMap ref={warp} in="SourceGraphic" in2="field" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="crept" />
+          {/* wet ink: soften, then re-cut, so corners pool and thin strokes swell */}
+          <feGaussianBlur ref={soak} in="crept" stdDeviation="0.8" result="soaked" />
+          <feColorMatrix ref={ink} in="soaked" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 10 -4.7" result="alive" />
           <feComposite in="alive" in2="mask" operator="in" />
         </filter>
       </svg>
