@@ -1,6 +1,8 @@
 'use client';
 
-// DitherVeil, as supplied. Changes for this site (marked `materia:`): the canvas crossfades in over a plain
+// DitherVeil, as supplied. Changes for this site (marked `materia:`). On load the dither grows in from paper,
+// holds, then clears outward from the centre to the clean logo; once settled the pointer brings the dither back.
+// Earlier note: the canvas crossfades in over a plain
 // fallback image once the picture has loaded, instead of opening as a solid ink rectangle.
 
 import { useEffect, useRef } from 'react';
@@ -34,6 +36,8 @@ const MAX_BURSTS = 4;
 const BURST_SECONDS = 1.2;
 const HOLD = 1.6;
 const INTRO_MS = 1100;
+const HOLD_MS = 700; // materia: the dither holds, then clears
+const SETTLE_MS = 1500; // materia: how long the clearing takes
 
 const hexToRgb = hex => {
   let h = String(hex || '').replace('#', '');
@@ -269,6 +273,7 @@ uniform float uContrast;
 uniform float uBrightness;
 uniform float uReverse;
 uniform float uIntro;
+uniform float uSettle;
 uniform float uHold;
 uniform vec3 uMatte;
 uniform float uKey;
@@ -359,6 +364,10 @@ void main() {
   vec2 point = vec2(cellUv.x, 1.0 - cellUv.y) * uSize;
   float mask = max(clamp(texture(tMask, cellUv).r * uHold, 0.0, 1.0), shockwave(point));
   float shown = mix(mask, 1.0 - mask, uReverse);
+  // materia: a disk grows from the centre; inside it the clean logo shows and the pointer brings the dither back
+  float far = length(uSize * 0.5);
+  float disk = clamp((uSettle * far * 1.35 - distance(point, uSize * 0.5)) / (far * 0.35), 0.0, 1.0);
+  shown = mix(shown, 1.0 - shown, disk);
   float order = bayer(cell.yx);
   float low = order * (1.0 - uRim);
   color = mix(color, uRimColor, step(low, shown) * step(0.001, uRim));
@@ -367,7 +376,7 @@ void main() {
   vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
   float spread = length((cellUv - 0.5) * aspect) / length(aspect * 0.5);
   float appear = step(spread * 0.72 + bayer(cell + vec2(3.0, 5.0)) * 0.28, uIntro * 1.001);
-  fragColor = vec4(mix(uInk, color, appear), 1.0);
+  fragColor = vec4(mix(uPaper, color, appear), 1.0); // materia: grows in from paper, not from ink
 }
 `;
 
@@ -429,11 +438,13 @@ const DitherVeil = ({
     try {
       renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio || 1, 2), alpha: false, antialias: false });
     } catch {
+      container.parentElement?.classList.add('veil-off');
       return undefined; // materia: no WebGL, the fallback image stays
     }
     // materia: the shaders are WebGL2 (#version 300 es); on WebGL1 leave the fallback image alone
     if (!renderer.isWebgl2) {
       renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
+      container.parentElement?.classList.add('veil-off');
       return undefined;
     }
     const gl = renderer.gl;
@@ -442,11 +453,10 @@ const DitherVeil = ({
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     // materia: hidden until the picture is drawn, then crossfaded in over the fallback image
-    canvas.style.opacity = '0';
-    canvas.style.transition = reducedMotion ? 'none' : 'opacity 0.7s ease';
+    canvas.style.opacity = '0'; // materia: shown from the first drawn frame; the dither itself grows in from paper
     container.appendChild(canvas);
     // materia: a lost context (e.g. iOS after backgrounding) shows the fallback image instead of a blank canvas
-    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); canvas.style.opacity = '0'; });
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); canvas.style.opacity = '0'; container.parentElement?.classList.replace('veil-on', 'veil-off'); });
 
     const floatMask = renderer.isWebgl2 && !!renderer.getExtension('EXT_color_buffer_float');
     const geometry = new Triangle(gl);
@@ -512,6 +522,7 @@ const DitherVeil = ({
       uBrightness: { value: 0 },
       uReverse: { value: 0 },
       uIntro: { value: 0 },
+      uSettle: { value: 0 },
       uHold: { value: HOLD },
       uMatte: { value: [0, 0, 0] },
       uKey: { value: 0 },
@@ -728,12 +739,15 @@ const DitherVeil = ({
       viewUniforms.uReverse.value = s.reverse ? 1 : 0;
       const intro = image ? Math.min(1, (now - introStart) / INTRO_MS) : 0;
       viewUniforms.uIntro.value = 1 - Math.pow(1 - intro, 2);
+      // materia: after the intro and a short hold, the dither clears outward to the clean logo
+      const settle = image ? Math.min(1, Math.max(0, (now - introStart - INTRO_MS - HOLD_MS) / SETTLE_MS)) : 0;
+      viewUniforms.uSettle.value = settle < 0.5 ? 2 * settle * settle : 1 - Math.pow(-2 * settle + 2, 2) / 2;
       renderer.render({ scene: viewMesh });
-      if (image) canvas.style.opacity = '1'; // materia
+      if (image && canvas.style.opacity !== '1') { canvas.style.opacity = '1'; container.parentElement?.classList.add('veil-on'); } // materia
 
       // materia: render only while something changes; a resting pointer no longer redraws every frame
       const settling = Math.abs((pointer.inside || wanderOn ? 1 : 0) - presence) > 0.002;
-      const busy = wanderOn || settling || bursts.length > 0 || now < trailUntil || (image && intro < 1);
+      const busy = wanderOn || settling || bursts.length > 0 || now < trailUntil || (image && settle < 1);
       if (busy && visible) raf = requestAnimationFrame(frame);
     };
 
@@ -757,7 +771,8 @@ const DitherVeil = ({
           viewUniforms.uKey.value = edge.plain ? 1 : 0;
         }
       } catch {}
-      introStart = performance.now() - INTRO_MS; // materia: no ink-to-picture intro, the canvas crossfades instead
+      // materia: the intro plays from paper; with reduced motion it starts settled on the clean logo
+      introStart = reducedMotion ? performance.now() - INTRO_MS - HOLD_MS - SETTLE_MS : performance.now();
       wake();
     };
     img.src = src;
