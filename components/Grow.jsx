@@ -101,10 +101,11 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
     // the edge's character follows the type: broad slow swells on the big words, a fine shiver on body text
     const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
     const freq = Math.min(0.07, Math.max(0.009, 1.1 / fs));
-    const amp = Math.min(5, Math.max(1.8, fs * 0.045));     // how far the outline creeps, px
-    const wet = Math.min(1.5, Math.max(0.55, fs * 0.012));  // how much the ink pools: blur before the re-cut
+    // headings creep visibly (at least 1.6px); small text only a touch, so it stays crisp
+    const amp = fs >= 24 ? Math.min(4.5, Math.max(1.6, fs * 0.04)) : Math.max(0.35, fs * 0.028); // creep, px
+    const wet = fs >= 24 ? Math.min(1.1, Math.max(0.45, fs * 0.0085)) : 0.32;                 // ink pooling, px
     soak.current?.setAttribute('stdDeviation', wet.toFixed(2));
-    const INK = 10; // crispness of the re-cut ink edge
+    const INK = 16; // crispness of the re-cut ink edge: steep, so the letters stay sharp
     const loop = 0.22 / freq; // each field drifts about a fifth of a cell: a sway, not a journey
     let w = 0, hgt = 0;
     const size = () => {
@@ -149,7 +150,7 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
       if (t < 1) { raf = requestAnimationFrame(tick); return; }
       grown = true;
       el.classList.add('grown');
-      if (!alive) el.classList.add('still'); // small text: crisp and still once grown
+      // small text keeps its filter, frozen on its last frame: nothing switches, so nothing snaps
       wake();
     };
     const io = new IntersectionObserver(([e]) => {
@@ -194,7 +195,7 @@ export default function Grow({ as: Tag = 'div', children, className = '', style,
           <feDisplacementMap ref={warp} in="SourceGraphic" in2="field" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="crept" />
           {/* wet ink: soften, then re-cut, so corners pool and thin strokes swell */}
           <feGaussianBlur ref={soak} in="crept" stdDeviation="0.8" result="soaked" />
-          <feColorMatrix ref={ink} in="soaked" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 10 -4.7" result="alive" />
+          <feColorMatrix ref={ink} in="soaked" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 16 -7.5" result="alive" />
           <feComposite in="alive" in2="mask" operator="in" />
         </filter>
       </svg>
