@@ -18,6 +18,13 @@
   .right .label { top: var(--y); left: calc(100% + var(--ext) + 16px); translate: 0 -50%; }
   .top .line { left: var(--x); top: calc(-1 * var(--ext)); height: calc(var(--y) + var(--ext)); width: 1px; --from: 50% 100%; }
   .top .label { left: var(--x); bottom: calc(100% + var(--ext) + 12px); translate: -50% 0; }
+  /* turn: up from the key to just above the board, then right at a right angle, past the board's edge */
+  .turn { --rise: calc(var(--ext) * 0.55); }
+  .turn .line { left: var(--x); top: calc(-1 * var(--rise)); height: calc(var(--y) + var(--rise)); width: 1px; --from: 50% 100%; }
+  .turn .e2 { display: block; position: absolute; background: var(--ink); top: calc(-1 * var(--rise)); left: var(--x); right: calc(-1 * var(--ext)); height: 1px;
+    transform-origin: 0 50%; transition: transform 1s var(--ease) 1.1s; }
+  :global(.js) .figure:not(:global(.in)) .turn .e2 { transform: scale(0); }
+  .turn .label { top: calc(-1 * var(--rise)); left: calc(100% + var(--ext) + 16px); translate: 0 -50%; }
   .bottom .line { left: var(--x); top: var(--y); bottom: calc(-1 * var(--ext)); width: 1px; --from: 50% 0; }
   .bottom .label { left: var(--x); top: calc(100% + var(--ext) + 12px); translate: -50% 0; }
   :global(.js) .figure:not(:global(.in)) .line { transform: scale(0); }
