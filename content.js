@@ -8,6 +8,10 @@ export const site = {
   description: 'GMK CYL Materia, a keycap set made together by Bowlkeyboards and Aiglatson Studio, in five Pantone browns.',
 };
 
+// The live address, used by link previews, the sitemap and robots.txt.
+// Vercel sets VERCEL_PROJECT_PRODUCTION_URL at build time, so these always point at the live domain.
+export const origin = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
+
 export const hero = {
   sentence: 'GMK CYL Materia, a keycap set made together by Bowlkeyboards and Aiglatson Studio.',
   action: { label: 'Find a vendor', href: '#vendors' },

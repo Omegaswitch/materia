@@ -1,13 +1,11 @@
 import { IM_Fell_English } from 'next/font/google';
-import { site } from '../content';
+import { site, origin } from '../content';
 import './globals.css';
 
 // Stand-in for the reference face. Swap here (next/font/google, or next/font/local with files in public/fonts/).
 const text = IM_Fell_English({ weight: '400', subsets: ['latin'], variable: '--f-text' });
 
 // Link previews (Discord, iMessage, Slack, X): Open Graph tags plus app/opengraph-image.jpg.
-// Vercel sets VERCEL_PROJECT_PRODUCTION_URL at build time, so the preview image always points at the live domain.
-const origin = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
 
 export const metadata = {
   metadataBase: new URL(origin),
