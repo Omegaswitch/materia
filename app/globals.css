@@ -1,78 +1,143 @@
 @import "tailwindcss";
 
-/* Colour tokens mirror content.js `palette` — change both together. */
 :root {
-  --bark: #5b3a31;
-  --rust: #974f42;
-  --clay: #99644e;
-  --paper: #ece3cf;
-  --paper-deep: #e2d6bc;
+  --paper: #ece4ce;          /* the paper of the deck */
+  --paper-deep: #e3d8bd;
   --ink: #2b1b15;
-  --ink-soft: #7a3f30;
+  --rust-ink: #7a3f30;       /* the definition colour in the deck, 7:1 on paper */
+  --clay: #a0624c;           /* GM / K in the lockup */
   --gutter: clamp(16px, 4vw, 56px);
-  --ease: cubic-bezier(0.7, 0, 0.2, 1);
-  /* Fonts: set in app/layout.jsx */
-  --font-display: var(--f-display), Georgia, serif;
-  --font-text: var(--f-text), Georgia, serif;
+  --gap: clamp(150px, 17vw, 280px);
+  --radius: 6px;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+
+  --step-small: 0.9375rem;
+  --step-body: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --step-lead: clamp(1.375rem, 1.1rem + 0.9vw, 2rem);
+  --step-head: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+  --step-display: clamp(3.5rem, 1rem + 8vw, 9rem);
+
+  --font: var(--f-text), Georgia, serif;
 }
 
-* { box-sizing: border-box; margin: 0; }
 html { scroll-behavior: smooth; }
+/* Every part of the site is a full page. Scrolling is never taken over (no snapping: it fights trackpad
+   momentum, traps content taller than the screen and jumps with the iOS address bar). Instead each part
+   fades in as it fills the screen and out as it leaves, so one part is seen at a time and the paper is
+   all that shows in between. */
+.page { min-height: 100svh; }
+@supports (animation-timeline: view()) {
+  .page { animation: page-turn linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes page-turn { 0%, 24% { opacity: 0; } 40%, 60% { opacity: 1; } 76%, 100% { opacity: 0; } }
+}
+/* Paged (components/Pager.jsx): every .page is a stage that fills the screen; only the current one is shown. */
+html.paged, html.paged body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.paged .page {
+  position: fixed; inset: 0; min-height: 0; height: 100%;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: none; /* only if a page ever outgrows its screen */
+  animation: none; background: var(--paper);
+}
+.paged .page::-webkit-scrollbar { display: none; }
+.paged .page:not(.on):not(.leaving) { display: none !important; }
+.paged .page.on { z-index: 2; }
+.paged .page.leaving { z-index: 1; pointer-events: none; }
+/* Where you are: a dot per page on the right edge, each a button to that page; the current one is a liquid drop.
+   Ink on paper; paper-coloured over the dark wood page (.pager--light). */
+.pager { --pitch: 28px; position: fixed; z-index: 10; right: clamp(4px, 1.4vw, 22px); top: 50%; translate: 0 -50%; display: grid; --tone: var(--ink); color: var(--tone); }
+.pager--light { --tone: var(--paper); }
+.pager button { position: relative; width: 28px; height: var(--pitch); padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }
+.pager button:hover::after { content: ''; position: absolute; inset: 8px; border-radius: 50%; outline: 1px solid var(--tone); opacity: 0.45; }
+.pager-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.pager-svg circle { fill: currentColor; transition: fill 0.6s; }
+.pager-dots circle { opacity: 0.3; }
+@media (max-width: 700px) { .pager { --pitch: 26px; } .pager button { width: 22px; } }
+
 html, body { overflow-x: clip; }
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-text);
-  font-size: clamp(17px, 1.1vw + 12px, 21px);
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-}
-img { display: block; max-width: 100%; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+body { background: var(--paper); color: var(--ink); font: var(--step-body) / 1.5 var(--font); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-weight: 400; line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--rust-ink); outline-offset: 3px; }
+::selection { background: var(--ink); color: var(--paper); }
+img { display: block; max-width: 100%; height: auto; }
 
-/* Aged paper: flat beige + grain + faint mottling, generated (no image asset). */
-.paper {
-  background-color: var(--paper);
-  background-image:
-    radial-gradient(ellipse at 20% 30%, rgb(160 120 70 / 0.08), transparent 60%),
-    radial-gradient(ellipse at 80% 70%, rgb(140 100 60 / 0.07), transparent 55%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.wrap { padding-inline: var(--gutter); }
+
+
+/* Text grows out of the page (components/Grow.jsx). Without JS or with reduced motion it is plain text. */
+.seep-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+:where(.seep) { position: relative; isolation: isolate; }
+.js .seep { filter: var(--grow); } /* stays on: the letters' outlines keep moving inside their shell */
+.js .seep.fade, .js .seep.still { filter: none; }
+.js .seep.fade { transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.js .seep.fade:not(.grown) { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .js .seep { filter: none; } }
+.head { font-size: var(--step-head); text-align: center; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The button is a small wooden plaque with a carved frame, like the deck's badge. */
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 2px 34px 0;
+  background: #673933 url(/assets/wood/plaque.webp) center / cover no-repeat;
+  color: var(--paper); text-decoration: none; font-size: var(--step-body); letter-spacing: 0.02em;
+  border-radius: 3px;
+  outline: 1px solid rgb(236 228 206 / 0.45); outline-offset: -6px;
+  transition: transform 0.5s var(--ease), filter 0.5s var(--ease), outline-offset 0.5s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); filter: brightness(1.1) saturate(1.05); outline-offset: -8px; text-decoration: none; }
+.btn:active { transform: translateY(1px); transition-duration: 0.1s; }
+.btn:focus-visible { outline: 2px solid var(--paper); outline-offset: -6px; box-shadow: 0 0 0 3px var(--rust-ink); }
+
+/* ---------- Drawn keycaps (kits). Legends are white sans, as on the GMK caps. ---------- */
+.board-box { container-type: inline-size; }
+.board { display: grid; gap: calc(100cqi / var(--n) * 0.06); }
+.board-row { display: flex; gap: calc(100cqi / var(--n) * 0.06); }
+.cap {
+  --u: calc(100cqi / var(--n, 15));
+  position: relative; display: block; flex: none;
+  width: calc(var(--w, 1) * var(--u) - var(--u) * 0.06); height: calc(var(--u) * 0.94);
+  border-radius: calc(var(--u) * 0.1);
+  background: var(--c);
+  background: color-mix(in oklab, var(--c) 70%, #120806);
+}
+.cap-top {
+  position: absolute; inset: calc(var(--u) * 0.05) calc(var(--u) * 0.1) calc(var(--u) * 0.16);
+  border-radius: calc(var(--u) * 0.07); background: var(--c); color: #f3ebdd;
+  font-size: calc(var(--u) * 0.24); padding: calc(var(--u) * 0.09) calc(var(--u) * 0.1);
+}
+.legend { display: block; width: 1em; height: 1em; overflow: visible; fill: currentColor; font-family: var(--font); }
+.board .legend { font-family: Arial, Helvetica, sans-serif; font-weight: 700; }
+
+/* ---------- Wood: a palette colour with one photo texture multiplied in, painted once ---------- */
+.wood {
+  background: var(--c) var(--tex) center / cover no-repeat;
+  background-blend-mode: multiply;
+}
+.js [data-lazy]:not(.in) .wood { background-image: none; } /* textures wait until the band is near */
+
+/* ---------- Parallax between sections: each layer drifts at its own rate (--p) as it crosses the screen.
+   Compositor-only scroll timelines; browsers without them, and reduced motion, get the still page. ---------- */
+@supports (animation-timeline: view()) {
+  .para { animation: para linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes para {
+    from { translate: 0 calc(var(--p, 1) * 4vh); }
+    to { translate: 0 calc(var(--p, 1) * -4vh); }
+  }
 }
 
-.section-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(36px, 5vw, 72px);
-  line-height: 1;
+/* ---------- Entrances: parts of a section rise in turn, once. Only when JS runs (html.js). ---------- */
+.js [data-reveal] > * { opacity: 0; transform: translateY(32px) scale(0.985); }
+.js [data-reveal].in > * {
+  opacity: 1; transform: none;
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 140ms);
 }
-
-/* ---------- Assets ---------- */
-.asset { position: relative; overflow: hidden; background: var(--paper-deep); width: 100%; }
-.asset img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s; }
-.asset--loading img { opacity: 0; }
-.asset--loading::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
-  animation: shimmer 1.4s infinite;
-}
-@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
-.asset--placeholder {
-  display: grid; place-items: center; padding: 16px; text-align: center;
-  border: 1.5px dashed rgb(91 58 49 / 0.45);
-  color: var(--bark); font-size: 0.8em; letter-spacing: 0.02em;
-  min-height: 120px;
-}
+[data-reveal] > :nth-child(2) { --i: 1; }
+[data-reveal] > :nth-child(3) { --i: 2; }
+[data-reveal] > :nth-child(4) { --i: 3; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  .js [data-reveal] > * { opacity: 1; transform: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-
-/* ---------- Stacked pages (components/Stack.tsx) ---------- */
-.stack > * {
-  position: sticky; top: 0; min-height: 100svh;
-  background-color: var(--paper);
-  box-shadow: 0 -18px 40px -24px rgb(43 27 21 / 0.45);
-}
-@media (prefers-reduced-motion: reduce) { .stack > * { position: relative; top: auto !important; } }

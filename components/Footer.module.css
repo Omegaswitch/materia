@@ -1,6 +1,31 @@
-.footer { position: relative; overflow: hidden; min-height: 70svh; display: flex; align-items: center; }
-.inner { width: 100%; padding: clamp(56px, 8vw, 120px) var(--gutter); display: grid; gap: 40px; }
-.vendors { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
-.vendors a { display: block; text-decoration: none; }
-.meta { display: flex; flex-wrap: wrap; gap: 8px 32px; font-size: 0.85em; color: var(--ink-soft); }
-.meta a { color: var(--ink); }
+.footer { display: flex; flex-direction: column; justify-content: center; padding-block: 6svh 32px; }
+.mark { height: 30svh; min-height: 180px; display: flex; align-items: flex-end; gap: 4px; overflow: hidden; }
+.block {
+  position: relative; isolation: isolate; overflow: hidden;
+  flex: 1; display: flex; justify-content: center; padding-top: 0.12em;
+  font-size: clamp(2.5rem, 9vw, 8.5rem); color: var(--paper); border-radius: var(--radius) var(--radius) 0 0;
+  background: #4f3028;
+}
+.block img { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+:global(.paged) .block { animation: none; }
+:global(.paged) :global(.page.on) .block { animation: arrive 1.2s var(--ease) both; animation-delay: calc(var(--i) * 70ms + 300ms); }
+@keyframes arrive { from { transform: translate3d(0, 70%, 0); } }
+@supports (animation-timeline: view()) {
+  html:not(:global(.paged)) .block { animation: rise linear both; animation-timeline: view(); animation-range: entry calc(var(--i) * 6%) cover 40%; }
+  @keyframes rise { from { transform: translate3d(0, 60%, 0); } }
+}
+.info { margin-top: clamp(28px, 5svh, 56px); display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; font-size: var(--step-small); }
+.info ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.info p + p { margin-top: 6px; }
+.makers { display: flex; gap: 16px; align-items: flex-start; max-width: 32ch; }
+.makers img { width: 32px; mix-blend-mode: multiply; flex: none; }
+.h { font-size: var(--step-body); margin-bottom: 12px; }
+.last { margin-top: clamp(24px, 4svh, 56px); font-size: var(--step-small); }
+@media (max-width: 799px) {
+  .mark { height: 20svh; min-height: 120px; }
+  .info { gap: 28px 20px; grid-template-columns: 1fr 1fr; font-size: 0.9375rem; }
+  .makers { grid-column: 1 / -1; }
+  .info ul { gap: 2px; }
+  .info a { display: inline-block; padding-block: 8px; }  /* 40px+ tap rows */
+  .last { font-size: 0.875rem; }
+}
