@@ -70,20 +70,15 @@ export const keyboard = {
 export const kitting = {
   heading: 'Kitting',
   items: [
-    { src: null, alt: 'PLACEHOLDER alt: base kit', label: 'Kitting image — Base kit', span: 4, ratio: '4 / 3' },
-    { src: null, alt: 'PLACEHOLDER alt: alphas kit', label: 'Kitting image — Alphas', span: 2, ratio: '3 / 4' },
-    { src: null, alt: 'PLACEHOLDER alt: modifiers kit', label: 'Kitting image — Modifiers', span: 3, ratio: '3 / 2' },
-    { src: null, alt: 'PLACEHOLDER alt: novelties kit', label: 'Kitting image — Novelties', span: 3, ratio: '3 / 2' },
+    // Add kitting images here, e.g. { src: '/assets/kitting/base.webp', alt: 'Base kit', label: 'Base kit', ratio: '4 / 3' },
   ],
 };
 
 export const renders = {
   heading: 'Renders',
   items: [
-    { src: null, alt: 'PLACEHOLDER alt: render 1', label: 'Render 1 — full board', span: 6, ratio: '21 / 9' },
-    { src: null, alt: 'PLACEHOLDER alt: render 2', label: 'Render 2 — detail', span: 2, ratio: '1 / 1' },
-    { src: null, alt: 'PLACEHOLDER alt: render 3', label: 'Render 3 — detail', span: 2, ratio: '1 / 1' },
-    { src: null, alt: 'PLACEHOLDER alt: render 4', label: 'Render 4 — detail', span: 2, ratio: '1 / 1' },
+    { src: '/assets/renders/render-01.webp', alt: 'MATERIA keycaps on a 60% keyboard leaning on a wooden armchair', label: 'Render 1', ratio: '1 / 1' },
+    { src: '/assets/renders/render-02.webp', alt: 'MATERIA keycaps on a 60% keyboard on a walnut table', label: 'Render 2', ratio: '1 / 1' },
   ],
 };
 

@@ -17,7 +17,7 @@ Almost everything lives in **`content.js`**. Any asset with `src: null` shows a 
 | Logo | `content.js` → `logo.src` |
 | Keyboard render | `content.js` → `keyboard.image.src` (blank-keycap render) |
 | Colour names, descriptions, callout positions | `content.js` → `keyboard.colors` (`x`/`y` = % position on the image, `side` = label above/below on desktop) |
-| Kitting images | `content.js` → `kitting.items` (one slide each in the horizontal slider; add/remove/reorder freely, `ratio` = aspect ratio) |
+| Kitting images | `content.js` → `kitting.items` (currently empty; add entries and they appear as slides before the renders) |
 | Renders | `content.js` → `renders.items` (same as kitting, slides follow kitting) |
 | Story copy | `content.js` → `story` (currently placeholder) |
 | Footer vendors, privacy link, contact info | `content.js` → `footer` |
