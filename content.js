@@ -43,8 +43,8 @@ export const colours = {
 };
 
 // Board rows: keys separated by spaces, `Name:2.25` sets a width in units, `_` is a spacebar.
-// Kits are drawn from these rows, each cap in one of the five colours, until kitting renders arrive:
-// set src to a kitting image to show it instead.
+// Only kits with a src (a kitting image) are shown; the section is hidden until at least one has one.
+// The rows are kept for reference (and for the drawn-board fallback in components/keys.jsx).
 export const kits = {
   heading: 'Kits',
   items: [ // PLACEHOLDER kit names and contents
@@ -63,7 +63,8 @@ export const kits = {
 
 // Renders shown in a simple gallery. Leave empty to hide the section.
 export const renders = [
-  // { src: '/assets/render-desk.webp', alt: '…', w: 1600, h: 1000 },
+  { src: '/assets/renders/render-01.webp', alt: 'GMK CYL Materia on a 60% keyboard leaning on a wooden armchair', w: 1600, h: 1600 },
+  { src: '/assets/renders/render-02.webp', alt: 'GMK CYL Materia on a 60% keyboard on a walnut table', w: 1600, h: 1600 },
 ];
 
 export const footer = {

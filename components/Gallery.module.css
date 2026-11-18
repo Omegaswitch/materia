@@ -1,2 +1,9 @@
-.section { display: grid; align-content: center; gap: clamp(24px, 4vw, 56px); }
-.img { width: min(100%, 1200px); margin-inline: auto; }
+.section { display: grid; align-content: center; gap: clamp(20px, 3svh, 40px); }
+/* All renders on one screen: side by side, height capped so the page never scrolls. */
+.row { display: flex; justify-content: center; gap: clamp(12px, 2vw, 32px); min-height: 0; }
+.img { flex: 0 1 auto; min-width: 0; width: auto; max-width: calc((100% - 32px) / 2); max-height: 68svh; object-fit: contain; height: auto; }
+@media (max-width: 799px) {
+  /* Phones: stacked, each capped so both fit under the heading. */
+  .row { flex-direction: column; align-items: center; }
+  .img { max-width: 100%; max-height: 34svh; }
+}
